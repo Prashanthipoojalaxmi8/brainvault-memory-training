@@ -175,15 +175,26 @@ export function GameInterface({ mode, onBackToMenu }: GameInterfaceProps) {
   };
 
   const handleInputChange = (value: string) => {
-    // Filter input based on mode type
-    let filteredValue = value;
+    // Filter input based on mode type and clean it
+    let filteredValue = value.trim();
+    
     if (config.type === 'digit') {
-      filteredValue = value.replace(/[^0-9]/g, '');
+      // Remove all non-digits and spaces, handle common substitutions
+      filteredValue = value
+        .replace(/[Oo]/g, '0')  // Convert O to 0
+        .replace(/[Il]/g, '1')  // Convert I/l to 1
+        .replace(/[^0-9]/g, ''); // Remove non-digits
     } else {
-      filteredValue = value.replace(/[^A-Za-z]/g, '').toUpperCase();
+      // Remove spaces and non-letters, convert to uppercase
+      filteredValue = value
+        .replace(/[^A-Za-z]/g, '')
+        .toUpperCase();
     }
     
-    setGameState(prev => ({ ...prev, userInput: filteredValue }));
+    // Limit length to reasonable maximum
+    if (filteredValue.length <= 7) {
+      setGameState(prev => ({ ...prev, userInput: filteredValue }));
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -359,12 +370,30 @@ export function GameInterface({ mode, onBackToMenu }: GameInterfaceProps) {
                     </p>
                   </div>
                   
-                  <Card className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 max-w-sm mx-auto mb-6">
+                  <Card className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 max-w-lg mx-auto mb-6">
                     <CardContent className="p-4">
-                      <div className="text-green-700 dark:text-green-300 font-semibold">
+                      <div className="text-green-700 dark:text-green-300 font-semibold mb-2">
                         +{calculateScore(gameState.currentLevel, gameState.timeRemaining)} Points
                       </div>
-                      <div className="text-sm text-green-600 dark:text-green-400">Level completed</div>
+                      <div className="text-sm text-green-600 dark:text-green-400 mb-3">Level completed</div>
+                      
+                      {/* Show correct answer confirmation */}
+                      <div className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+                        Correct sequence:
+                      </div>
+                      <div className="flex justify-center space-x-2 mb-2">
+                        {getCorrectAnswer(gameState.currentSequence, config.reverse).split('').map((char, index) => (
+                          <span 
+                            key={index}
+                            className="bg-green-100 dark:bg-green-800/20 text-green-700 dark:text-green-300 px-2 py-1 rounded font-mono text-sm"
+                          >
+                            {char}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        Your answer: {gameState.userInput}
+                      </div>
                     </CardContent>
                   </Card>
                 </div>

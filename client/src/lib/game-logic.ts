@@ -75,7 +75,55 @@ export function getCorrectAnswer(sequence: (string | number)[], reverse: boolean
 }
 
 export function validateAnswer(userInput: string, correctAnswer: string): boolean {
-  return userInput.toLowerCase().trim() === correctAnswer.toLowerCase().trim();
+  const userClean = userInput.toLowerCase().trim().replace(/\s+/g, '');
+  const correctClean = correctAnswer.toLowerCase().trim().replace(/\s+/g, '');
+  
+  // Exact match
+  if (userClean === correctClean) {
+    return true;
+  }
+  
+  // For sequences of same length, allow minor differences
+  if (userClean.length === correctClean.length) {
+    let differences = 0;
+    for (let i = 0; i < userClean.length; i++) {
+      if (userClean[i] !== correctClean[i]) {
+        differences++;
+      }
+    }
+    
+    // Allow 1 character difference for sequences of 4+ characters
+    // This handles cases like typing 'O' instead of '0' or similar mistakes
+    if (correctClean.length >= 4 && differences === 1) {
+      return true;
+    }
+    
+    // For shorter sequences, be more strict
+    if (correctClean.length <= 3 && differences === 0) {
+      return true;
+    }
+  }
+  
+  // For different lengths, check if user just missed/added one character
+  if (Math.abs(userClean.length - correctClean.length) === 1) {
+    const shorter = userClean.length < correctClean.length ? userClean : correctClean;
+    const longer = userClean.length < correctClean.length ? correctClean : userClean;
+    
+    // Check if shorter string is contained in longer string with 1 insertion
+    for (let i = 0; i <= longer.length - shorter.length; i++) {
+      let matches = 0;
+      for (let j = 0; j < shorter.length; j++) {
+        if (shorter[j] === longer[i + j]) {
+          matches++;
+        }
+      }
+      if (matches >= shorter.length - 1) {
+        return true;
+      }
+    }
+  }
+  
+  return false;
 }
 
 export function calculateScore(level: number, timeRemaining: number): number {
