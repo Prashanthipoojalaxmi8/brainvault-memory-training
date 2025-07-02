@@ -78,13 +78,23 @@ export function validateAnswer(userInput: string, correctAnswer: string): boolea
   const userClean = userInput.toLowerCase().trim().replace(/\s+/g, '');
   const correctClean = correctAnswer.toLowerCase().trim().replace(/\s+/g, '');
   
-  // Exact match
+  // Debug logging to help identify issues
+  console.log('Validation check:', {
+    userInput,
+    correctAnswer,
+    userClean,
+    correctClean,
+    exactMatch: userClean === correctClean
+  });
+  
+  // Exact match - this should handle most cases
   if (userClean === correctClean) {
+    console.log('✓ Exact match found');
     return true;
   }
   
-  // For sequences of same length, allow minor differences
-  if (userClean.length === correctClean.length) {
+  // For sequences of same length, allow minor differences for longer sequences
+  if (userClean.length === correctClean.length && userClean.length >= 4) {
     let differences = 0;
     for (let i = 0; i < userClean.length; i++) {
       if (userClean[i] !== correctClean[i]) {
@@ -93,13 +103,7 @@ export function validateAnswer(userInput: string, correctAnswer: string): boolea
     }
     
     // Allow 1 character difference for sequences of 4+ characters
-    // This handles cases like typing 'O' instead of '0' or similar mistakes
-    if (correctClean.length >= 4 && differences === 1) {
-      return true;
-    }
-    
-    // For shorter sequences, be more strict
-    if (correctClean.length <= 3 && differences === 0) {
+    if (differences === 1) {
       return true;
     }
   }
@@ -109,7 +113,7 @@ export function validateAnswer(userInput: string, correctAnswer: string): boolea
     const shorter = userClean.length < correctClean.length ? userClean : correctClean;
     const longer = userClean.length < correctClean.length ? correctClean : userClean;
     
-    // Check if shorter string is contained in longer string with 1 insertion
+    // Check if shorter string is contained in longer string with minimal differences
     for (let i = 0; i <= longer.length - shorter.length; i++) {
       let matches = 0;
       for (let j = 0; j < shorter.length; j++) {
