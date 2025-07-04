@@ -78,56 +78,8 @@ export function validateAnswer(userInput: string, correctAnswer: string): boolea
   const userClean = userInput.toLowerCase().trim().replace(/\s+/g, '');
   const correctClean = correctAnswer.toLowerCase().trim().replace(/\s+/g, '');
   
-  // Debug logging to help identify issues
-  console.log('Validation check:', {
-    userInput,
-    correctAnswer,
-    userClean,
-    correctClean,
-    exactMatch: userClean === correctClean
-  });
-  
-  // Exact match - this should handle most cases
-  if (userClean === correctClean) {
-    console.log('✓ Exact match found');
-    return true;
-  }
-  
-  // For sequences of same length, allow minor differences for longer sequences
-  if (userClean.length === correctClean.length && userClean.length >= 4) {
-    let differences = 0;
-    for (let i = 0; i < userClean.length; i++) {
-      if (userClean[i] !== correctClean[i]) {
-        differences++;
-      }
-    }
-    
-    // Allow 1 character difference for sequences of 4+ characters
-    if (differences === 1) {
-      return true;
-    }
-  }
-  
-  // For different lengths, check if user just missed/added one character
-  if (Math.abs(userClean.length - correctClean.length) === 1) {
-    const shorter = userClean.length < correctClean.length ? userClean : correctClean;
-    const longer = userClean.length < correctClean.length ? correctClean : userClean;
-    
-    // Check if shorter string is contained in longer string with minimal differences
-    for (let i = 0; i <= longer.length - shorter.length; i++) {
-      let matches = 0;
-      for (let j = 0; j < shorter.length; j++) {
-        if (shorter[j] === longer[i + j]) {
-          matches++;
-        }
-      }
-      if (matches >= shorter.length - 1) {
-        return true;
-      }
-    }
-  }
-  
-  return false;
+  // Strict exact match only - no tolerance for differences
+  return userClean === correctClean;
 }
 
 export function calculateScore(level: number, timeRemaining: number): number {
