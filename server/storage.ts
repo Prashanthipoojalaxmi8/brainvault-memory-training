@@ -1,4 +1,6 @@
 import { users, gameStats, type User, type InsertUser, type GameStats, type InsertGameStats } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -8,54 +10,39 @@ export interface IStorage {
   createGameStats(stats: InsertGameStats): Promise<GameStats>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private gameStats: Map<number, GameStats>;
-  private currentUserId: number;
-  private currentStatsId: number;
-
-  constructor() {
-    this.users = new Map();
-    this.gameStats = new Map();
-    this.currentUserId = 1;
-    this.currentStatsId = 1;
-  }
-
+export class DatabaseStorage implements IStorage {
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentUserId++;
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
     return user;
   }
 
   async getGameStats(userId?: number): Promise<GameStats[]> {
-    const allStats = Array.from(this.gameStats.values());
     if (userId) {
-      return allStats.filter(stat => stat.userId === userId);
+      return await db.select().from(gameStats).where(eq(gameStats.userId, userId));
     }
-    return allStats;
+    return await db.select().from(gameStats);
   }
 
   async createGameStats(insertStats: InsertGameStats): Promise<GameStats> {
-    const id = this.currentStatsId++;
-    const stats: GameStats = { 
-      ...insertStats, 
-      id, 
-      completedAt: new Date()
-    };
-    this.gameStats.set(id, stats);
+    const [stats] = await db
+      .insert(gameStats)
+      .values(insertStats)
+      .returning();
     return stats;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
