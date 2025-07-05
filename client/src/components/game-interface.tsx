@@ -27,7 +27,7 @@ export function GameInterface({ mode, onBackToMenu }: GameInterfaceProps) {
   
   const [gameState, setGameState] = useState<GameState>({
     currentMode: mode,
-    currentLevel: 3,
+    currentLevel: 1,
     currentScore: 0,
     currentSequence: [],
     userInput: '',
@@ -54,7 +54,9 @@ export function GameInterface({ mode, onBackToMenu }: GameInterfaceProps) {
   }, [displayTimer, gameTimer]);
 
   const startLevel = useCallback(() => {
-    const sequence = generateSequence(mode, gameState.currentLevel);
+    // Convert level (1-5) to sequence length (3-7)
+    const sequenceLength = gameState.currentLevel + 2;
+    const sequence = generateSequence(mode, sequenceLength);
     setGameState(prev => ({
       ...prev,
       currentSequence: sequence,
@@ -142,12 +144,12 @@ export function GameInterface({ mode, onBackToMenu }: GameInterfaceProps) {
   const continueGame = () => {
     const wasCorrect = gameState.stats.correct > gameState.stats.incorrect;
     
-    if (wasCorrect && gameState.currentLevel < 7) {
+    if (wasCorrect && gameState.currentLevel < 5) {
       setGameState(prev => ({ ...prev, currentLevel: prev.currentLevel + 1 }));
     }
 
     // If reached max level or failed too many times, end the session
-    if (gameState.currentLevel >= 7 || gameState.stats.incorrect >= 3) {
+    if (gameState.currentLevel >= 5 || gameState.stats.incorrect >= 3) {
       // Save results and return to menu
       updateGameResult(
         mode,
@@ -208,7 +210,7 @@ export function GameInterface({ mode, onBackToMenu }: GameInterfaceProps) {
     startLevel();
   }, [startLevel]);
 
-  const progressPercentage = ((gameState.currentLevel - 3) / (7 - 3)) * 100;
+  const progressPercentage = ((gameState.currentLevel - 1) / (5 - 1)) * 100;
   const timerProgress = (gameState.timeRemaining / 30) * 100;
 
   return (
@@ -241,8 +243,8 @@ export function GameInterface({ mode, onBackToMenu }: GameInterfaceProps) {
           
           <Progress value={progressPercentage} className="mb-2" />
           <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
-            <span>Level 3</span>
-            <span>Level 7</span>
+            <span>Level 1</span>
+            <span>Level 5</span>
           </div>
         </CardContent>
       </Card>

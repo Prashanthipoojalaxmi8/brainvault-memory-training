@@ -89,7 +89,7 @@ export function ModeSelection({ onSelectMode, onShowInstructions }: ModeSelectio
                     <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
                       <span className="flex items-center">
                         <Grid3X3 className="h-3 w-3 mr-1" />
-                        Levels: 3-7 {config.type === 'digit' ? 'digits' : 'letters'}
+                        5 Levels: 3-7 {config.type === 'digit' ? 'digits' : 'letters'}
                       </span>
                       <span className="flex items-center">
                         ⏱️ 30s per task
