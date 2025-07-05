@@ -265,7 +265,7 @@ export function GameInterface({ mode, onBackToMenu }: GameInterfaceProps) {
                 {gameState.currentSequence.map((item, index) => (
                   <div
                     key={index}
-                    className="bg-primary text-white rounded-lg w-16 h-16 flex items-center justify-center text-2xl font-bold shadow-md animate-pulse-slow"
+                    className="bg-primary text-white rounded-lg w-16 h-16 flex items-center justify-center text-2xl font-bold shadow-md"
                   >
                     {item}
                   </div>
