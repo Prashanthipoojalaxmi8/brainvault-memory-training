@@ -1,0 +1,105 @@
+"""
+🧠 Operation Span Task (OpS) - Game 3
+--------------------------------------
+This is a simple memory + math challenge game to test working memory.
+
+🌟 What does it test?
+Your ability to:
+1. Solve a math problem
+2. Remember a word shown with it
+3. After a few such pairs, recall all the words in the correct order
+
+🔁 This game includes 3 levels:
+- Level 1: Easy (basic addition/subtraction)
+- Level 2: Medium (multiplication and small division)
+- Level 3: Mixed (slightly more complex but still manageable)
+
+🧩 What you’ll do:
+1. Solve the given math problem
+2. A word will be shown—remember it!
+3. After 3 rounds, you’ll be asked to recall all the words IN ORDER
+
+🎯 Example:
+Math: (3 + 2) = ?  ➜ You answer: 5  
+Word: "Apple" ➜ You remember it  
+Do this 3 times  
+Then: “Tell the words in order” ➜ You type: Apple, Chair, Tree
+
+✅ Goal: Solve + Remember = WIN!
+"""
+
+import random
+import time
+
+# Word list
+words = ["Apple", "Chair", "Tree", "Bottle", "Window", "Pencil", "Laptop", "Phone", "Bag", "Shoes", "Clock", "Mouse", "Camera", "Paper"]
+
+# Math question generator
+def generate_question(level):
+    if level == 1:  # Easy
+        a = random.randint(1, 10)
+        b = random.randint(1, 10)
+        op = random.choice(['+', '-'])
+    elif level == 2:  # Medium
+        a = random.randint(2, 10)
+        b = random.randint(2, 10)
+        op = random.choice(['*', '/'])
+        if op == '/':
+            a = a * b  # to ensure result is an integer
+    else:  # Mixed
+        a = random.randint(5, 15)
+        b = random.randint(1, 10)
+        op = random.choice(['+', '-', '*', '/'])
+        if op == '/':
+            a = a * b
+
+    question = f"{a} {op} {b}"
+    correct_answer = eval(question)
+    if op == '/':
+        correct_answer = int(correct_answer)
+    return question, correct_answer
+
+# Main game loop
+def play_game(level):
+    print(f"\n🔢 LEVEL {level} START!\n")
+    time.sleep(1)
+
+    num_pairs = 3
+    remembered_words = []
+
+    for i in range(num_pairs):
+        q, ans = generate_question(level)
+        word = random.choice(words)
+        print(f"\nPair {i+1}:")
+        print(f"Solve this: ({q}) = ?")
+        user_input = input("Your answer: ")
+
+        try:
+            if int(user_input) == ans:
+                print("✅ Correct!")
+            else:
+                print(f"❌ Incorrect. The right answer is {ans}.")
+        except:
+            print(f"❌ Invalid input. The right answer is {ans}.")
+
+        print(f"Now remember this word: \"{word}\"\n")
+        remembered_words.append(word)
+        time.sleep(2)
+
+    print("\n⏳ Time to recall the words in order!")
+    recall = input("Type the 3 words you remember, separated by commas:\n").split(',')
+
+    recall = [w.strip().capitalize() for w in recall]
+    score = sum([1 for i in range(num_pairs) if i < len(recall) and recall[i] == remembered_words[i]])
+
+    print("\n✅ Correct sequence was:", ', '.join(remembered_words))
+    print("🎯 Your recalled sequence:", ', '.join(recall))
+    print(f"🧠 You got {score} out of {num_pairs} words correct!\n")
+
+# Run all 3 levels
+for level in range(1, 4):
+    play_game(level)
+    if level < 3:
+        input("Press Enter to continue to the next level...\n")
+
+print("🎉 Game Over! Great job testing your brain!")

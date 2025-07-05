@@ -32,6 +32,14 @@ export const MODES: Record<GameMode, ModeConfig> = {
     reverse: true,
     icon: 'grid-2x2',
     color: 'orange'
+  },
+  'operation-span': {
+    title: 'Operation Span Task',
+    description: 'Solve math problems while remembering words, then recall all words in order.',
+    type: 'mixed',
+    reverse: false,
+    icon: 'calculator',
+    color: 'red'
   }
 };
 
@@ -100,4 +108,63 @@ export function formatTime(seconds: number): string {
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
   return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+}
+
+// Operation Span Task functions
+const WORDS = ["Apple", "Chair", "Tree", "Bottle", "Window", "Pencil", "Laptop", "Phone", "Bag", "Shoes", "Clock", "Mouse", "Camera", "Paper", "Flower", "Coffee", "Music", "Garden", "Bridge", "Ocean"];
+
+export function generateMathQuestion(level: number): { question: string; answer: number } {
+  let a: number, b: number, op: string, question: string, answer: number;
+
+  if (level === 1) { // Easy
+    a = Math.floor(Math.random() * 10) + 1;
+    b = Math.floor(Math.random() * 10) + 1;
+    op = Math.random() < 0.5 ? '+' : '-';
+    if (op === '-' && a < b) [a, b] = [b, a]; // Ensure positive result
+  } else if (level === 2) { // Medium
+    a = Math.floor(Math.random() * 9) + 2;
+    b = Math.floor(Math.random() * 9) + 2;
+    op = Math.random() < 0.5 ? '*' : '/';
+    if (op === '/') {
+      const temp = a * b;
+      a = temp;
+    }
+  } else { // Mixed
+    a = Math.floor(Math.random() * 11) + 5;
+    b = Math.floor(Math.random() * 10) + 1;
+    const operations = ['+', '-', '*', '/'];
+    op = operations[Math.floor(Math.random() * operations.length)];
+    if (op === '-' && a < b) [a, b] = [b, a];
+    if (op === '/') {
+      const temp = a * b;
+      a = temp;
+    }
+  }
+
+  question = `${a} ${op} ${b}`;
+  answer = Math.round(eval(question));
+  
+  return { question, answer };
+}
+
+export function getRandomWord(): string {
+  return WORDS[Math.floor(Math.random() * WORDS.length)];
+}
+
+export function validateMathAnswer(userAnswer: string, correctAnswer: number): boolean {
+  const userNum = parseInt(userAnswer.trim());
+  return !isNaN(userNum) && userNum === correctAnswer;
+}
+
+export function validateWordRecall(userWords: string[], correctWords: string[]): number {
+  const userCleaned = userWords.map(w => w.trim().toLowerCase());
+  const correctCleaned = correctWords.map(w => w.toLowerCase());
+  
+  let score = 0;
+  for (let i = 0; i < Math.min(userCleaned.length, correctCleaned.length); i++) {
+    if (userCleaned[i] === correctCleaned[i]) {
+      score++;
+    }
+  }
+  return score;
 }

@@ -20,13 +20,15 @@ const defaultProgress: StoredProgress = {
     'ds-forward': 0,
     'ds-backward': 0,
     'spatial-forward': 0,
-    'spatial-backward': 0
+    'spatial-backward': 0,
+    'operation-span': 0
   },
   bestLevels: {
     'ds-forward': 0,
     'ds-backward': 0,
     'spatial-forward': 0,
-    'spatial-backward': 0
+    'spatial-backward': 0,
+    'operation-span': 0
   },
   totalSessions: 0,
   overallStats: {

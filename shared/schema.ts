@@ -37,8 +37,9 @@ export type GameStats = typeof gameStats.$inferSelect;
 export type InsertGameStats = z.infer<typeof insertGameStatsSchema>;
 
 // Game mode types
-export type GameMode = 'ds-forward' | 'ds-backward' | 'spatial-forward' | 'spatial-backward';
+export type GameMode = 'ds-forward' | 'ds-backward' | 'spatial-forward' | 'spatial-backward' | 'operation-span';
 export type GamePhase = 'menu' | 'display' | 'input' | 'feedback';
+export type OperationSpanPhase = 'math' | 'word' | 'recall' | 'feedback';
 
 export interface GameState {
   currentMode: GameMode | null;
@@ -56,10 +57,31 @@ export interface GameState {
   };
 }
 
+export interface OperationSpanState {
+  currentLevel: number;
+  currentScore: number;
+  currentPair: number;
+  totalPairs: number;
+  currentMathQuestion: string;
+  currentMathAnswer: number;
+  currentWord: string;
+  rememberedWords: string[];
+  userMathInput: string;
+  userRecallInput: string;
+  gamePhase: OperationSpanPhase;
+  stats: {
+    mathCorrect: number;
+    mathIncorrect: number;
+    wordsCorrect: number;
+    totalTime: number;
+    attempts: number;
+  };
+}
+
 export interface ModeConfig {
   title: string;
   description: string;
-  type: 'digit' | 'letter';
+  type: 'digit' | 'letter' | 'mixed';
   reverse: boolean;
   icon: string;
   color: string;
