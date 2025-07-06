@@ -42,7 +42,11 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
     }
   });
 
+  const [timeRemaining, setTimeRemaining] = useState(20);
+
   const [startTime, setStartTime] = useState<number>(0);
+  const [mathTimer, setMathTimer] = useState<NodeJS.Timeout | null>(null);
+  const [recallTimer, setRecallTimer] = useState<NodeJS.Timeout | null>(null);
 
   const generateNewPair = useCallback(() => {
     const mathData = generateMathQuestion(gameState.currentLevel);
@@ -57,7 +61,20 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
       gamePhase: 'math'
     }));
     setStartTime(Date.now());
-  }, [gameState.currentLevel]);
+    setTimeRemaining(20);
+    
+    // Start math timer
+    if (mathTimer) clearTimeout(mathTimer);
+    const newTimer = setTimeout(() => {
+      toast({
+        title: "Time's up!",
+        description: "Auto-submitting your answer...",
+        variant: "destructive",
+      });
+      submitMathAnswer();
+    }, 20000);
+    setMathTimer(newTimer);
+  }, [gameState.currentLevel, mathTimer]);
 
   const submitMathAnswer = () => {
     const isCorrect = validateMathAnswer(gameState.userMathInput, gameState.currentMathAnswer);

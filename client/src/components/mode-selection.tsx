@@ -33,11 +33,19 @@ const iconMap = {
 };
 
 const colorMap = {
-  blue: 'bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400',
-  purple: 'bg-purple-100 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400',
-  green: 'bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400',
-  orange: 'bg-orange-100 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400',
-  red: 'bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400',
+  blue: 'bg-gradient-to-br from-blue-500 to-blue-700',
+  purple: 'bg-gradient-to-br from-purple-500 to-purple-700',
+  green: 'bg-gradient-to-br from-green-500 to-green-700',
+  orange: 'bg-gradient-to-br from-orange-500 to-orange-700',
+  red: 'bg-gradient-to-br from-red-500 to-red-700',
+};
+
+const backgroundColorMap = {
+  blue: 'bg-gradient-to-br from-blue-400 to-blue-600',
+  purple: 'bg-gradient-to-br from-purple-400 to-purple-600',
+  green: 'bg-gradient-to-br from-green-400 to-green-600',
+  orange: 'bg-gradient-to-br from-orange-400 to-orange-600',
+  red: 'bg-gradient-to-br from-red-400 to-red-600',
 };
 
 export function ModeSelection({ onSelectMode, onShowInstructions }: ModeSelectionProps) {
@@ -55,59 +63,61 @@ export function ModeSelection({ onSelectMode, onShowInstructions }: ModeSelectio
 
   return (
     <div className="space-y-8">
-      <div className="text-center mb-12">
+      <div className="text-center mb-8">
         <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-          Choose Training Mode
+          Memory Training Games
         </h2>
         <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-          Select a cognitive assessment mode to begin training. Each mode tests different aspects of working memory and attention.
+          Choose from our collection of cognitive assessment games. Each game tests different aspects of working memory and attention.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Square Widget Games Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
         {Object.entries(MODES).map(([key, config]) => {
           const mode = key as GameMode;
           const Icon = iconMap[config.icon as keyof typeof iconMap];
           const colorClass = colorMap[config.color as keyof typeof colorMap];
+          const bgColorClass = backgroundColorMap[config.color as keyof typeof backgroundColorMap];
           const bestLevel = progress.bestLevels[mode];
+          const bestScore = progress.bestScores[mode];
           
           return (
             <Card 
               key={mode}
-              className="hover:shadow-md transition-shadow cursor-pointer group"
+              className={`aspect-square hover:shadow-lg transition-all duration-200 hover:scale-105 cursor-pointer group relative overflow-hidden border-0 ${bgColorClass}`}
               onClick={() => onSelectMode(mode)}
             >
-              <CardContent className="p-6">
-                <div className="flex items-start space-x-4">
-                  <div className={`rounded-lg p-3 flex-shrink-0 ${colorClass}`}>
-                    <Icon className="h-5 w-5" />
+              <CardContent className="p-4 h-full flex flex-col text-white">
+                {/* Game Icon and Title */}
+                <div className="flex-1 flex flex-col items-center justify-center text-center">
+                  <div className={`rounded-xl p-3 ${colorClass} mb-3 group-hover:scale-110 transition-transform`}>
+                    <Icon className="h-8 w-8 text-white" />
                   </div>
-                  <div className="flex-1">
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2 group-hover:text-primary transition-colors">
-                      {config.title}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-400 mb-4">
-                      {config.description}
-                    </p>
-                    <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-                      <span className="flex items-center">
-                        <Grid3X3 className="h-3 w-3 mr-1" />
-                        5 Levels: 3-7 {config.type === 'digit' ? 'digits' : 'letters'}
-                      </span>
-                      <span className="flex items-center">
-                        ⏱️ 30s per task
-                      </span>
+                  
+                  <h3 className="text-sm font-bold text-white mb-1 leading-tight">
+                    {config.title.split(' - ')[0]}
+                  </h3>
+                  <p className="text-xs text-white/80 mb-2">
+                    {config.title.includes(' - ') ? config.title.split(' - ')[1] : config.type === 'mixed' ? 'Dual Task' : config.reverse ? 'Reverse' : 'Forward'}
+                  </p>
+                </div>
+                
+                {/* Stats */}
+                <div className="mt-auto">
+                  <div className="text-center">
+                    <div className="text-xs text-white/70">
+                      Best: L{bestLevel} • {bestScore}pts
                     </div>
                   </div>
                 </div>
-                <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-500 dark:text-gray-400">Personal Best</span>
-                    <span className="font-semibold text-primary">
-                      {bestLevel > 0 ? `Level ${bestLevel}` : 'Not attempted'}
-                    </span>
+                
+                {/* NEW badge for new games */}
+                {(mode === 'operation-span' || bestLevel === 0) && (
+                  <div className="absolute top-2 right-2 bg-white text-red-500 text-xs px-2 py-1 rounded-full font-bold">
+                    NEW
                   </div>
-                </div>
+                )}
               </CardContent>
             </Card>
           );

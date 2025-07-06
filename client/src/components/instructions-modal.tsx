@@ -85,7 +85,7 @@ export function InstructionsModal({ open, onClose }: InstructionsModalProps) {
               <div>
                 <h5 className="font-medium text-gray-800 dark:text-gray-200 mb-1">Operation Span Task</h5>
                 <ol className="list-decimal list-inside space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                  <li>Solve math problems while remembering words shown after each problem</li>
+                  <li>Solve math problems within 20 seconds while remembering words shown after each problem</li>
                   <li>Complete all math-word pairs in a level (3 pairs per level)</li>
                   <li>Recall all words in the exact order they were presented</li>
                   <li>Progress through 3 levels with increasing difficulty</li>
