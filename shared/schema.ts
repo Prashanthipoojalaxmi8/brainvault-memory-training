@@ -41,6 +41,17 @@ export type GameMode = 'ds-forward' | 'ds-backward' | 'spatial-forward' | 'spati
 export type GamePhase = 'menu' | 'display' | 'input' | 'feedback';
 export type OperationSpanPhase = 'math' | 'word' | 'recall' | 'feedback';
 
+// Main game categories
+export type MainGame = 'wechsler-memory-scale' | 'operation-span-task';
+
+export interface MainGameConfig {
+  title: string;
+  description: string;
+  icon: string;
+  color: string;
+  modes?: GameMode[];
+}
+
 export interface GameState {
   currentMode: GameMode | null;
   currentLevel: number;

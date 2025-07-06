@@ -38,7 +38,7 @@ export function GameHeader({ onBackToMenu, showBackButton = false }: GameHeaderP
             </div>
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                Wechsler Memory Scale
+                BrainVault
               </h1>
               <p className="text-gray-600 dark:text-gray-400">
                 Cognitive Training Assessment
