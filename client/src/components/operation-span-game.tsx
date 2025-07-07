@@ -125,6 +125,7 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
     const userWords = gameState.userRecallInput.split(',').map(w => w.trim());
     const wordsCorrect = validateWordRecall(userWords, gameState.rememberedWords);
     const totalPossible = gameState.rememberedWords.length;
+    const isPerfect = wordsCorrect === totalPossible;
     
     const levelScore = (gameState.stats.mathCorrect * 10) + (wordsCorrect * 20);
     
@@ -139,10 +140,18 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
       gamePhase: 'feedback'
     }));
 
-    toast({
-      title: "Level Complete!",
-      description: `You remembered ${wordsCorrect} out of ${totalPossible} words correctly.`,
-    });
+    if (isPerfect) {
+      toast({
+        title: "Perfect Recall!",
+        description: `You remembered all ${totalPossible} words in the correct order.`,
+      });
+    } else {
+      toast({
+        title: "Incomplete Recall",
+        description: `You need to remember all ${totalPossible} words in the exact order to score points.`,
+        variant: "destructive"
+      });
+    }
   };
 
   const continueToNextLevel = () => {
@@ -334,10 +343,13 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
             <div className="text-center">
               <div className="mb-6">
                 <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Recall all words in order
+                  Recall all words in exact order
                 </h3>
-                <div className="text-sm text-gray-500 dark:text-gray-400">
+                <div className="text-sm text-gray-500 dark:text-gray-400 mb-2">
                   Type the {gameState.totalPairs} words separated by commas
+                </div>
+                <div className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-3 py-1 rounded-full inline-block">
+                  ⚠️ Must be ALL words in EXACT order to score points
                 </div>
               </div>
               
@@ -390,9 +402,18 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
                       </span>
                     ))}
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
                     Your recall: {gameState.userRecallInput || '(no answer)'}
                   </div>
+                  {validateWordRecall(gameState.userRecallInput.split(',').map(w => w.trim()), gameState.rememberedWords) === gameState.rememberedWords.length ? (
+                    <div className="text-xs text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded">
+                      ✓ Perfect match - All words correct in order
+                    </div>
+                  ) : (
+                    <div className="text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded">
+                      ✗ Incomplete - Need all words in exact order
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 

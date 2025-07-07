@@ -157,14 +157,25 @@ export function validateMathAnswer(userAnswer: string, correctAnswer: number): b
 }
 
 export function validateWordRecall(userWords: string[], correctWords: string[]): number {
-  const userCleaned = userWords.map(w => w.trim().toLowerCase());
+  const userCleaned = userWords.map(w => w.trim().toLowerCase()).filter(w => w.length > 0);
   const correctCleaned = correctWords.map(w => w.toLowerCase());
   
-  let score = 0;
-  for (let i = 0; i < Math.min(userCleaned.length, correctCleaned.length); i++) {
-    if (userCleaned[i] === correctCleaned[i]) {
-      score++;
+  // For Operation Span Task, we need strict validation:
+  // 1. User must provide exactly the same number of words
+  // 2. All words must be in the exact correct order
+  // 3. Only award points if the complete sequence is perfect
+  
+  if (userCleaned.length !== correctCleaned.length) {
+    return 0; // Wrong number of words = 0 points
+  }
+  
+  // Check if all words match in exact order
+  for (let i = 0; i < correctCleaned.length; i++) {
+    if (userCleaned[i] !== correctCleaned[i]) {
+      return 0; // Any word wrong = 0 points
     }
   }
-  return score;
+  
+  // Perfect match = full points
+  return correctCleaned.length;
 }
