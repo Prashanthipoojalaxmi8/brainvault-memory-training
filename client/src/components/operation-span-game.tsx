@@ -43,40 +43,35 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
   });
 
   const [timeRemaining, setTimeRemaining] = useState(20);
-
   const [startTime, setStartTime] = useState<number>(0);
   const [mathTimer, setMathTimer] = useState<NodeJS.Timeout | null>(null);
-  const [recallTimer, setRecallTimer] = useState<NodeJS.Timeout | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const generateNewPair = useCallback(() => {
-    const mathData = generateMathQuestion(gameState.currentLevel);
-    const word = getRandomWord();
-    
-    setGameState(prev => ({
-      ...prev,
-      currentMathQuestion: mathData.question,
-      currentMathAnswer: mathData.answer,
-      currentWord: word,
-      userMathInput: '',
-      gamePhase: 'math'
-    }));
+    setGameState(prev => {
+      const mathData = generateMathQuestion(prev.currentLevel);
+      const word = getRandomWord();
+      
+      return {
+        ...prev,
+        currentMathQuestion: mathData.question,
+        currentMathAnswer: mathData.answer,
+        currentWord: word,
+        userMathInput: '',
+        gamePhase: 'math'
+      };
+    });
     setStartTime(Date.now());
     setTimeRemaining(20);
-    
-    // Start math timer
-    if (mathTimer) clearTimeout(mathTimer);
-    const newTimer = setTimeout(() => {
-      toast({
-        title: "Time's up!",
-        description: "Auto-submitting your answer...",
-        variant: "destructive",
-      });
-      submitMathAnswer();
-    }, 20000);
-    setMathTimer(newTimer);
-  }, [gameState.currentLevel, mathTimer]);
+  }, []);
 
   const submitMathAnswer = () => {
+    // Clear any existing timers first
+    if (mathTimer) {
+      clearTimeout(mathTimer);
+      setMathTimer(null);
+    }
+    
     const isCorrect = validateMathAnswer(gameState.userMathInput, gameState.currentMathAnswer);
     
     setGameState(prev => ({
@@ -197,10 +192,32 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
     }
   };
 
-  // Start first pair on mount
+  // Initialize game only once
   useEffect(() => {
-    generateNewPair();
-  }, [generateNewPair]);
+    if (!isInitialized) {
+      const mathData = generateMathQuestion(1);
+      const word = getRandomWord();
+      
+      setGameState(prev => ({
+        ...prev,
+        currentMathQuestion: mathData.question,
+        currentMathAnswer: mathData.answer,
+        currentWord: word,
+        userMathInput: '',
+        gamePhase: 'math'
+      }));
+      setStartTime(Date.now());
+      setTimeRemaining(20);
+      setIsInitialized(true);
+    }
+  }, [isInitialized]);
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      if (mathTimer) clearTimeout(mathTimer);
+    };
+  }, [mathTimer]);
 
   const progressPercentage = ((gameState.currentLevel - 1) / 2) * 100;
 
