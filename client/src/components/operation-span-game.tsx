@@ -21,11 +21,21 @@ interface OperationSpanGameProps {
 export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
   const { toast } = useToast();
   
+  // Function to get total pairs based on level
+  const getTotalPairs = (level: number) => {
+    switch (level) {
+      case 1: return 3;
+      case 2: return 4;
+      case 3: return 5;
+      default: return 3;
+    }
+  };
+
   const [gameState, setGameState] = useState<OperationSpanState>({
     currentLevel: 1,
     currentScore: 0,
     currentPair: 1,
-    totalPairs: 3,
+    totalPairs: getTotalPairs(1),
     currentMathQuestion: '',
     currentMathAnswer: 0,
     currentWord: '',
@@ -97,8 +107,10 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
   const rememberWordAndContinue = () => {
     setGameState(prev => {
       const newRememberedWords = [...prev.rememberedWords, prev.currentWord];
+      const isLastPair = prev.currentPair >= prev.totalPairs;
       
-      if (prev.currentPair >= prev.totalPairs) {
+      if (isLastPair) {
+        // This was the last pair, move to recall phase
         return {
           ...prev,
           rememberedWords: newRememberedWords,
@@ -106,6 +118,7 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
           userRecallInput: ''
         };
       } else {
+        // More pairs to go, increment counter
         return {
           ...prev,
           rememberedWords: newRememberedWords,
@@ -114,6 +127,7 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
       }
     });
 
+    // Only generate new pair if we're not at the last pair
     if (gameState.currentPair < gameState.totalPairs) {
       setTimeout(() => {
         generateNewPair();
@@ -175,9 +189,13 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
       return;
     }
 
+    const nextLevel = gameState.currentLevel + 1;
+    const nextTotalPairs = getTotalPairs(nextLevel);
+
     setGameState(prev => ({
       ...prev,
-      currentLevel: prev.currentLevel + 1,
+      currentLevel: nextLevel,
+      totalPairs: nextTotalPairs,
       currentPair: 1,
       rememberedWords: [],
       userMathInput: '',
