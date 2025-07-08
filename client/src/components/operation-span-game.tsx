@@ -2,8 +2,11 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Progress } from "@/components/ui/progress";
 import { CheckCircle, XCircle, Calculator, Eye } from "lucide-react";
+import { AnimatedProgress } from "@/components/ui/animated-progress";
+import { AnimatedScore, LevelProgress } from "@/components/ui/animated-score";
+import { GameTransition, WordFlash } from "@/components/ui/game-animations";
+import { motion, AnimatePresence } from "framer-motion";
 import { OperationSpanState } from "@shared/schema";
 import { 
   generateMathQuestion, 
@@ -55,6 +58,10 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
   const [currentMathData, setCurrentMathData] = useState<{question: string, answer: number} | null>(null);
   const [currentWordData, setCurrentWordData] = useState<string>('');
   const [isInitialized, setIsInitialized] = useState(false);
+  const [showTransition, setShowTransition] = useState(false);
+  const [transitionData, setTransitionData] = useState<{title: string, description?: string, type: 'success' | 'error' | 'info'}>({title: '', type: 'info'});
+  const [showWordFlash, setShowWordFlash] = useState(false);
+  const [previousScore, setPreviousScore] = useState(0);
 
   // Initialize first math question when component mounts
   useEffect(() => {
@@ -103,6 +110,9 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
       currentWord: word,
       gamePhase: 'word'
     }));
+    
+    // Show word flash animation
+    setShowWordFlash(true);
   };
 
   const handleWordRemember = () => {
@@ -157,12 +167,19 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
     if (isLevelComplete) {
       const newLevel = gameState.currentLevel + 1;
       const newScore = gameState.currentScore + (wordsCorrect * 10);
+      setPreviousScore(gameState.currentScore);
       
-      toast({
+      // Show success transition
+      setTransitionData({
         title: "Level Complete!",
         description: `You remembered all ${gameState.totalPairs} words correctly!`,
-        variant: "default",
+        type: 'success'
       });
+      setShowTransition(true);
+      
+      setTimeout(() => {
+        setShowTransition(false);
+      }, 2000);
 
       if (newLevel <= 3) {
         // Move to next level
@@ -199,17 +216,21 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
       }
     } else {
       // Level failed
-      toast({
+      setTransitionData({
         title: "Level Failed",
         description: `You got ${wordsCorrect} out of ${gameState.totalPairs} words correct.`,
-        variant: "destructive",
+        type: 'error'
       });
+      setShowTransition(true);
       
-      updateGameResult('operation-span', gameState.currentScore, gameState.currentLevel);
-      setGameState(prev => ({
-        ...prev,
-        gamePhase: 'feedback'
-      }));
+      setTimeout(() => {
+        setShowTransition(false);
+        updateGameResult('operation-span', gameState.currentScore, gameState.currentLevel);
+        setGameState(prev => ({
+          ...prev,
+          gamePhase: 'feedback'
+        }));
+      }, 2000);
     }
   };
 
@@ -262,96 +283,184 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
             </div>
             
             <div className="flex gap-6 mb-6">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-purple-600">{gameState.currentLevel}</div>
-                <div className="text-sm text-gray-600">Level</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">{gameState.currentScore}</div>
-                <div className="text-sm text-gray-600">Score</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">{gameState.currentPair}</div>
-                <div className="text-sm text-gray-600">Pair</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-orange-600">{gameState.totalPairs}</div>
-                <div className="text-sm text-gray-600">Total</div>
-              </div>
+              <AnimatedScore 
+                value={gameState.currentLevel} 
+                label="Level" 
+                color="text-purple-600"
+                size="md"
+              />
+              <AnimatedScore 
+                value={gameState.currentScore} 
+                previousValue={previousScore}
+                label="Score" 
+                color="text-blue-600"
+                size="md"
+              />
+              <AnimatedScore 
+                value={gameState.currentPair} 
+                label="Pair" 
+                color="text-green-600"
+                size="md"
+              />
+              <AnimatedScore 
+                value={gameState.totalPairs} 
+                label="Total" 
+                color="text-orange-600"
+                size="md"
+              />
             </div>
             
-            <Progress 
-              value={(gameState.rememberedWords.length / gameState.totalPairs) * 100} 
-              className="mb-4"
-            />
+            <div className="mb-4">
+              <LevelProgress 
+                currentLevel={gameState.currentLevel} 
+                maxLevel={3} 
+                className="mb-2"
+              />
+              <AnimatedProgress 
+                value={gameState.rememberedWords.length} 
+                max={gameState.totalPairs}
+                color="bg-gradient-to-r from-blue-500 to-purple-500"
+                height="h-3"
+                showValue={true}
+              />
+            </div>
           </CardContent>
         </Card>
 
-        {gameState.gamePhase === 'math' && (
-          <Card>
-            <CardContent className="p-6">
-              <div className="text-center mb-6">
-                <Calculator className="mx-auto text-purple-600 mb-4" size={48} />
-                <h2 className="text-xl font-bold mb-2">Solve the Math Problem</h2>
-                <p className="text-gray-600">Enter the answer to continue</p>
-              </div>
-              
-              <div className="text-center mb-6">
-                <div className="text-3xl font-bold text-purple-800 mb-4">
-                  {gameState.currentMathQuestion}
-                </div>
-                <Input
-                  type="number"
-                  value={gameState.userMathInput}
-                  onChange={(e) => setGameState(prev => ({ ...prev, userMathInput: e.target.value }))}
-                  onKeyPress={(e) => handleKeyPress(e, handleMathSubmit)}
-                  placeholder="Enter answer"
-                  className="text-center text-xl max-w-xs mx-auto"
-                />
-              </div>
-              
-              <div className="flex justify-center">
-                <Button 
-                  onClick={handleMathSubmit}
-                  disabled={!gameState.userMathInput}
-                  className="bg-purple-600 hover:bg-purple-700"
-                >
-                  Submit Answer
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        <AnimatePresence mode="wait">
+          {gameState.gamePhase === 'math' && (
+            <motion.div
+              key="math-phase"
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 50 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Card>
+                <CardContent className="p-6">
+                  <motion.div 
+                    className="text-center mb-6"
+                    initial={{ y: -20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.1 }}
+                  >
+                    <motion.div
+                      animate={{ rotate: [0, 10, -10, 0] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      <Calculator className="mx-auto text-purple-600 mb-4" size={48} />
+                    </motion.div>
+                    <h2 className="text-xl font-bold mb-2">Solve the Math Problem</h2>
+                    <p className="text-gray-600">Enter the answer to continue</p>
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="text-center mb-6"
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    <motion.div 
+                      className="text-3xl font-bold text-purple-800 mb-4"
+                      animate={{ scale: [1, 1.05, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      {gameState.currentMathQuestion}
+                    </motion.div>
+                    <Input
+                      type="number"
+                      value={gameState.userMathInput}
+                      onChange={(e) => setGameState(prev => ({ ...prev, userMathInput: e.target.value }))}
+                      onKeyPress={(e) => handleKeyPress(e, handleMathSubmit)}
+                      placeholder="Enter answer"
+                      className="text-center text-xl max-w-xs mx-auto"
+                    />
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="flex justify-center"
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    <Button 
+                      onClick={handleMathSubmit}
+                      disabled={!gameState.userMathInput}
+                      className="bg-purple-600 hover:bg-purple-700"
+                    >
+                      Submit Answer
+                    </Button>
+                  </motion.div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {gameState.gamePhase === 'word' && (
-          <Card>
-            <CardContent className="p-6">
-              <div className="text-center mb-6">
-                <Eye className="mx-auto text-green-600 mb-4" size={48} />
-                <h2 className="text-xl font-bold mb-2">Remember This Word</h2>
-                <p className="text-gray-600">Remember this word for later recall</p>
-              </div>
-              
-              <div className="text-center mb-6">
-                <div className="text-4xl font-bold text-green-800 mb-4">
-                  {gameState.currentWord}
-                </div>
-                <p className="text-gray-600">
-                  Word {gameState.currentPair} of {gameState.totalPairs}
-                </p>
-              </div>
-              
-              <div className="flex justify-center">
-                <Button 
-                  onClick={handleWordRemember}
-                  className="bg-green-600 hover:bg-green-700"
-                >
-                  Remember & Continue
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+          {gameState.gamePhase === 'word' && (
+            <motion.div
+              key="word-phase"
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 50 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Card>
+                <CardContent className="p-6">
+                  <motion.div 
+                    className="text-center mb-6"
+                    initial={{ y: -20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.1 }}
+                  >
+                    <motion.div
+                      animate={{ scale: [1, 1.1, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      <Eye className="mx-auto text-green-600 mb-4" size={48} />
+                    </motion.div>
+                    <h2 className="text-xl font-bold mb-2">Remember This Word</h2>
+                    <p className="text-gray-600">Remember this word for later recall</p>
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="text-center mb-6"
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                  >
+                    <motion.div 
+                      className="text-4xl font-bold text-green-800 mb-4"
+                      animate={{ 
+                        textShadow: ["0 0 0px #22c55e", "0 0 20px #22c55e", "0 0 0px #22c55e"],
+                        scale: [1, 1.05, 1]
+                      }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      {gameState.currentWord}
+                    </motion.div>
+                    <p className="text-gray-600">
+                      Word {gameState.currentPair} of {gameState.totalPairs}
+                    </p>
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="flex justify-center"
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    <Button 
+                      onClick={handleWordRemember}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      Remember & Continue
+                    </Button>
+                  </motion.div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
 
         {gameState.gamePhase === 'recall' && (
           <Card>
@@ -421,6 +530,23 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
             </CardContent>
           </Card>
         )}
+        
+        {/* Game Transition Animations */}
+        <GameTransition
+          isVisible={showTransition}
+          title={transitionData.title}
+          description={transitionData.description}
+          type={transitionData.type}
+          onComplete={() => setShowTransition(false)}
+        />
+        
+        {/* Word Flash Animation */}
+        <WordFlash
+          word={gameState.currentWord}
+          isVisible={showWordFlash}
+          duration={1500}
+          onComplete={() => setShowWordFlash(false)}
+        />
       </div>
     </div>
   );

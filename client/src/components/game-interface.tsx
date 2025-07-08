@@ -2,8 +2,11 @@ import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Progress } from "@/components/ui/progress";
 import { CheckCircle, XCircle, Eraser, Check } from "lucide-react";
+import { AnimatedProgress, CircularProgress } from "@/components/ui/animated-progress";
+import { AnimatedScore, LevelProgress } from "@/components/ui/animated-score";
+import { SequenceDisplay, TimerDisplay } from "@/components/ui/game-animations";
+import { motion, AnimatePresence } from "framer-motion";
 import { GameMode, GameState, GamePhase } from "@shared/schema";
 import { 
   MODES, 
@@ -44,6 +47,8 @@ export function GameInterface({ mode, onBackToMenu }: GameInterfaceProps) {
   const [displayTimer, setDisplayTimer] = useState<NodeJS.Timeout | null>(null);
   const [gameTimer, setGameTimer] = useState<NodeJS.Timeout | null>(null);
   const [startTime, setStartTime] = useState<number>(0);
+  const [currentSequenceIndex, setCurrentSequenceIndex] = useState(0);
+  const [previousScore, setPreviousScore] = useState(0);
 
   // Clear timers on unmount
   useEffect(() => {
@@ -116,6 +121,7 @@ export function GameInterface({ mode, onBackToMenu }: GameInterfaceProps) {
 
       let newScore = prev.currentScore;
       if (isCorrect) {
+        setPreviousScore(prev.currentScore);
         newScore += calculateScore(prev.currentLevel, prev.timeRemaining);
       }
 
@@ -228,20 +234,35 @@ export function GameInterface({ mode, onBackToMenu }: GameInterfaceProps) {
               </p>
             </div>
             <div className="flex items-center space-x-6">
-              <div className="text-center">
-                <div className="text-sm text-gray-500 dark:text-gray-400">Level</div>
-                <div className="text-xl font-bold text-primary">{gameState.currentLevel}</div>
-              </div>
-              <div className="text-center">
-                <div className="text-sm text-gray-500 dark:text-gray-400">Score</div>
-                <div className="text-xl font-bold text-green-600">
-                  {gameState.currentScore.toLocaleString()}
-                </div>
-              </div>
+              <AnimatedScore 
+                value={gameState.currentLevel} 
+                label="Level" 
+                color="text-primary"
+                size="md"
+              />
+              <AnimatedScore 
+                value={gameState.currentScore} 
+                previousValue={previousScore}
+                label="Score" 
+                color="text-green-600"
+                size="md"
+              />
             </div>
           </div>
           
-          <Progress value={progressPercentage} className="mb-2" />
+          <div className="space-y-3">
+            <LevelProgress 
+              currentLevel={gameState.currentLevel} 
+              maxLevel={5} 
+              className="mb-2"
+            />
+            <AnimatedProgress 
+              value={progressPercentage} 
+              color="bg-gradient-to-r from-blue-500 to-purple-500"
+              height="h-2"
+              animated={true}
+            />
+          </div>
           <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
             <span>Level 1</span>
             <span>Level 5</span>
@@ -252,111 +273,136 @@ export function GameInterface({ mode, onBackToMenu }: GameInterfaceProps) {
       {/* Game Display Area */}
       <Card>
         <CardContent className="p-8">
-          {gameState.gamePhase === 'display' && (
-            <div className="text-center">
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Remember this sequence
-                </h3>
-                <div className="text-sm text-gray-500 dark:text-gray-400">
-                  Pay attention - it will disappear soon
-                </div>
-              </div>
-              
-              <div className="flex justify-center space-x-4 mb-8">
-                {gameState.currentSequence.map((item, index) => (
-                  <div
-                    key={index}
-                    className="bg-primary text-white rounded-lg w-16 h-16 flex items-center justify-center text-2xl font-bold shadow-md"
-                  >
-                    {item}
-                  </div>
-                ))}
-              </div>
-
-              <div className="text-center">
-                <div className="text-gray-500 dark:text-gray-400">Memorize the sequence above</div>
-              </div>
-            </div>
-          )}
-
-          {gameState.gamePhase === 'input' && (
-            <div className="text-center">
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Enter the sequence
-                </h3>
-                <div className="text-sm text-gray-500 dark:text-gray-400">
-                  {config.reverse 
-                    ? `Type the ${config.type}s in reverse order` 
-                    : `Type the ${config.type}s in the same order`}
-                </div>
-              </div>
-
-              {/* Timer Circle */}
-              <div className="flex justify-center mb-8">
-                <div className="relative w-24 h-24">
-                  <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
-                    <circle 
-                      cx="50" 
-                      cy="50" 
-                      r="45" 
-                      stroke="currentColor" 
-                      strokeWidth="8" 
-                      fill="none"
-                      className="text-gray-200 dark:text-gray-700"
-                    />
-                    <circle 
-                      cx="50" 
-                      cy="50" 
-                      r="45" 
-                      stroke="currentColor" 
-                      strokeWidth="8" 
-                      fill="none" 
-                      strokeDasharray="283" 
-                      strokeDashoffset={283 - (timerProgress / 100) * 283}
-                      className="text-primary timer-circle"
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-xl font-bold text-primary">
-                      {gameState.timeRemaining}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="max-w-md mx-auto mb-6">
-                <Input
-                  type="text"
-                  value={gameState.userInput}
-                  onChange={(e) => handleInputChange(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  className="text-center text-2xl font-mono py-3"
-                  placeholder="Enter sequence..."
-                  autoFocus
-                />
-              </div>
-
-              <div className="flex justify-center space-x-4">
-                <Button variant="outline" onClick={clearInput}>
-                  <Eraser className="h-4 w-4 mr-2" />
-                  Clear
-                </Button>
-                <Button 
-                  onClick={submitAnswer}
-                  disabled={gameState.userInput.length === 0}
+          <AnimatePresence mode="wait">
+            {gameState.gamePhase === 'display' && (
+              <motion.div
+                key="display-phase"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1.1 }}
+                transition={{ duration: 0.3 }}
+                className="text-center"
+              >
+                <motion.div 
+                  className="mb-6"
+                  initial={{ y: -20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.1 }}
                 >
-                  <Check className="h-4 w-4 mr-2" />
-                  Submit
-                </Button>
-              </div>
+                  <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Remember this sequence
+                  </h3>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    Pay attention - it will disappear soon
+                  </div>
+                </motion.div>
+                
+                <SequenceDisplay
+                  sequence={gameState.currentSequence}
+                  currentIndex={gameState.currentSequence.length - 1}
+                  isVisible={true}
+                />
 
-              <div className="mt-4 text-xs text-gray-400 dark:text-gray-500">
-                Press Enter to submit or use the button above
-              </div>
-            </div>
-          )}
+                <motion.div 
+                  className="text-center"
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <div className="text-gray-500 dark:text-gray-400">Memorize the sequence above</div>
+                </motion.div>
+              </motion.div>
+            )}
+            {gameState.gamePhase === 'input' && (
+              <motion.div
+                key="input-phase"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1.1 }}
+                transition={{ duration: 0.3 }}
+                className="text-center"
+              >
+                <motion.div 
+                  className="mb-6"
+                  initial={{ y: -20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.1 }}
+                >
+                  <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Enter the sequence
+                  </h3>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    {config.reverse 
+                      ? `Type the ${config.type}s in reverse order` 
+                      : `Type the ${config.type}s in the same order`}
+                  </div>
+                </motion.div>
+
+                {/* Animated Timer */}
+                <motion.div 
+                  className="flex justify-center mb-8"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                >
+                  <CircularProgress
+                    value={gameState.timeRemaining}
+                    max={30}
+                    size={96}
+                    strokeWidth={8}
+                    color={gameState.timeRemaining <= 5 ? "#ef4444" : "#3b82f6"}
+                    showValue={true}
+                    animated={true}
+                  />
+                </motion.div>
+
+                <motion.div 
+                  className="max-w-md mx-auto mb-6"
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <Input
+                    type="text"
+                    value={gameState.userInput}
+                    onChange={(e) => handleInputChange(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    className="text-center text-2xl font-mono py-3"
+                    placeholder="Enter sequence..."
+                    autoFocus
+                  />
+                </motion.div>
+
+                <motion.div 
+                  className="flex justify-center space-x-4"
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                >
+                  <Button variant="outline" onClick={clearInput}>
+                    <Eraser className="h-4 w-4 mr-2" />
+                    Clear
+                  </Button>
+                  <Button 
+                    onClick={submitAnswer}
+                    disabled={gameState.userInput.length === 0}
+                  >
+                    <Check className="h-4 w-4 mr-2" />
+                    Submit
+                  </Button>
+                </motion.div>
+
+                <motion.div 
+                  className="mt-4 text-xs text-gray-400 dark:text-gray-500"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  Press Enter to submit or use the button above
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {gameState.gamePhase === 'feedback' && (
             <div className="text-center">
