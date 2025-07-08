@@ -52,12 +52,10 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
     }
   });
 
-  const [timeRemaining, setTimeRemaining] = useState(20);
   const [startTime, setStartTime] = useState<number>(0);
-  const [mathTimer, setMathTimer] = useState<NodeJS.Timeout | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  const generateNewPair = useCallback(() => {
+  const generateNewPair = () => {
     setGameState(prev => {
       const mathData = generateMathQuestion(prev.currentLevel);
       const word = getRandomWord();
@@ -72,16 +70,9 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
       };
     });
     setStartTime(Date.now());
-    setTimeRemaining(20);
-  }, []);
+  };
 
   const submitMathAnswer = () => {
-    // Clear any existing timers first
-    if (mathTimer) {
-      clearTimeout(mathTimer);
-      setMathTimer(null);
-    }
-    
     const isCorrect = validateMathAnswer(gameState.userMathInput, gameState.currentMathAnswer);
     
     setGameState(prev => ({
@@ -107,11 +98,10 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
   const rememberWordAndContinue = () => {
     setGameState(prev => {
       const newRememberedWords = [...prev.rememberedWords, prev.currentWord];
-      console.log(`DEBUG: Current pair: ${prev.currentPair}, Total pairs: ${prev.totalPairs}, Words collected: ${newRememberedWords.length}`);
       
-      // Check if this was the last pair (we've completed all pairs)
-      if (prev.currentPair >= prev.totalPairs) {
-        console.log("DEBUG: This was the last pair, moving to recall phase");
+      // Check if we've completed all pairs
+      if (newRememberedWords.length >= prev.totalPairs) {
+        // We have collected all words, move to recall phase
         return {
           ...prev,
           rememberedWords: newRememberedWords,
@@ -119,22 +109,15 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
           userRecallInput: ''
         };
       } else {
-        // More pairs to go, increment counter
-        const nextPair = prev.currentPair + 1;
-        console.log(`DEBUG: Moving to pair ${nextPair} of ${prev.totalPairs}`);
-        
-        // Only schedule next pair if we still have pairs left after incrementing
-        if (nextPair <= prev.totalPairs) {
-          setTimeout(() => {
-            console.log("DEBUG: Generating new pair");
-            generateNewPair();
-          }, 1000);
-        }
+        // More pairs to go, increment counter and generate next pair
+        setTimeout(() => {
+          generateNewPair();
+        }, 1000);
         
         return {
           ...prev,
           rememberedWords: newRememberedWords,
-          currentPair: nextPair
+          currentPair: prev.currentPair + 1
         };
       }
     });
@@ -227,7 +210,6 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
   // Initialize game only once
   useEffect(() => {
     if (!isInitialized) {
-      console.log("DEBUG: Initializing game with totalPairs:", getTotalPairs(1));
       const mathData = generateMathQuestion(1);
       const word = getRandomWord();
       
@@ -240,17 +222,9 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
         gamePhase: 'math'
       }));
       setStartTime(Date.now());
-      setTimeRemaining(20);
       setIsInitialized(true);
     }
   }, [isInitialized]);
-
-  // Cleanup timers on unmount
-  useEffect(() => {
-    return () => {
-      if (mathTimer) clearTimeout(mathTimer);
-    };
-  }, [mathTimer]);
 
   const progressPercentage = ((gameState.currentLevel - 1) / 2) * 100;
 
