@@ -121,29 +121,42 @@ export function generateMathQuestion(level: number): { question: string; answer:
     b = Math.floor(Math.random() * 10) + 1;
     op = Math.random() < 0.5 ? '+' : '-';
     if (op === '-' && a < b) [a, b] = [b, a]; // Ensure positive result
+    
+    question = `${a} ${op} ${b}`;
+    answer = op === '+' ? a + b : a - b;
   } else if (level === 2) { // Medium
     a = Math.floor(Math.random() * 9) + 2;
     b = Math.floor(Math.random() * 9) + 2;
     op = Math.random() < 0.5 ? '*' : '/';
+    
     if (op === '/') {
-      const temp = a * b;
-      a = temp;
+      // Generate division that results in whole numbers
+      answer = b;
+      a = answer * a; // Make sure a is divisible by b
+      question = `${a} ${op} ${b}`;
+    } else {
+      question = `${a} ${op} ${b}`;
+      answer = a * b;
     }
   } else { // Mixed
     a = Math.floor(Math.random() * 11) + 5;
     b = Math.floor(Math.random() * 10) + 1;
-    const operations = ['+', '-', '*', '/'];
+    const operations = ['+', '-', '*'];
     op = operations[Math.floor(Math.random() * operations.length)];
+    
     if (op === '-' && a < b) [a, b] = [b, a];
-    if (op === '/') {
-      const temp = a * b;
-      a = temp;
+    
+    question = `${a} ${op} ${b}`;
+    if (op === '+') {
+      answer = a + b;
+    } else if (op === '-') {
+      answer = a - b;
+    } else {
+      answer = a * b;
     }
   }
-
-  question = `${a} ${op} ${b}`;
-  answer = Math.round(eval(question));
   
+  console.log('Generated math question:', { question, answer, a, b, op });
   return { question, answer };
 }
 
@@ -153,7 +166,16 @@ export function getRandomWord(): string {
 
 export function validateMathAnswer(userAnswer: string, correctAnswer: number): boolean {
   const userNum = parseInt(userAnswer.trim());
-  return !isNaN(userNum) && userNum === correctAnswer;
+  const isValid = !isNaN(userNum) && userNum === correctAnswer;
+  
+  console.log('validateMathAnswer:', {
+    userAnswer: userAnswer.trim(),
+    userNum,
+    correctAnswer,
+    isValid
+  });
+  
+  return isValid;
 }
 
 export function validateWordRecall(userWords: string[], correctWords: string[]): number {

@@ -84,6 +84,13 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
     
     const isCorrect = validateMathAnswer(gameState.userMathInput, currentMathData.answer);
     
+    console.log('DEBUG Math:', {
+      userInput: gameState.userMathInput,
+      correctAnswer: currentMathData.answer,
+      question: currentMathData.question,
+      isCorrect
+    });
+    
     // Update stats
     setGameState(prev => ({
       ...prev,
@@ -100,6 +107,8 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
         description: `The correct answer was ${currentMathData.answer}`,
         variant: "destructive",
       });
+    } else {
+      console.log('DEBUG Math Correct - no toast shown');
     }
 
     // Generate word and move to word phase
@@ -154,7 +163,15 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
     const wordsCorrect = validateWordRecall(userWords, correctWords);
     const isLevelComplete = wordsCorrect === gameState.totalPairs;
     
-    // Update stats
+    console.log('DEBUG Recall:', {
+      userWords,
+      correctWords,
+      wordsCorrect,
+      totalPairs: gameState.totalPairs,
+      isLevelComplete
+    });
+    
+    // Update stats first
     setGameState(prev => ({
       ...prev,
       stats: {
@@ -169,6 +186,8 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
       const newScore = gameState.currentScore + (wordsCorrect * 10);
       setPreviousScore(gameState.currentScore);
       
+      console.log('DEBUG Level Complete:', { newLevel, newScore, wordsCorrect });
+      
       // Show success transition
       setTransitionData({
         title: "Level Complete!",
@@ -177,48 +196,46 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
       });
       setShowTransition(true);
       
+      // Use longer delay to show success message
       setTimeout(() => {
         setShowTransition(false);
-      }, 2000);
-
-      if (newLevel <= 3) {
-        // Move to next level
-        const nextLevelPairs = getTotalPairs(newLevel);
-        const mathData = generateMathQuestion(newLevel);
-        setCurrentMathData(mathData);
         
-        setGameState(prev => ({
-          ...prev,
-          currentLevel: newLevel,
-          currentScore: newScore,
-          totalPairs: nextLevelPairs,
-          currentPair: 1,
-          rememberedWords: [],
-          currentMathQuestion: mathData.question,
-          currentMathAnswer: mathData.answer,
-          userMathInput: '',
-          userRecallInput: '',
-          gamePhase: 'math'
-        }));
-      } else {
-        // Game complete
-        updateGameResult('operation-span', newScore, newLevel);
-        toast({
-          title: "Game Complete!",
-          description: `Final Score: ${newScore}`,
-          variant: "default",
-        });
-        setGameState(prev => ({
-          ...prev,
-          currentScore: newScore,
-          gamePhase: 'feedback'
-        }));
-      }
+        if (newLevel <= 3) {
+          // Move to next level
+          const nextLevelPairs = getTotalPairs(newLevel);
+          const mathData = generateMathQuestion(newLevel);
+          setCurrentMathData(mathData);
+          
+          setGameState(prev => ({
+            ...prev,
+            currentLevel: newLevel,
+            currentScore: newScore,
+            totalPairs: nextLevelPairs,
+            currentPair: 1,
+            rememberedWords: [],
+            currentMathQuestion: mathData.question,
+            currentMathAnswer: mathData.answer,
+            userMathInput: '',
+            userRecallInput: '',
+            gamePhase: 'math'
+          }));
+        } else {
+          // Game complete
+          updateGameResult('operation-span', newScore, newLevel);
+          setGameState(prev => ({
+            ...prev,
+            currentScore: newScore,
+            gamePhase: 'feedback'
+          }));
+        }
+      }, 3000); // Longer delay for better UX
     } else {
+      console.log('DEBUG Level Failed:', { wordsCorrect, totalPairs: gameState.totalPairs });
+      
       // Level failed
       setTransitionData({
         title: "Level Failed",
-        description: `You got ${wordsCorrect} out of ${gameState.totalPairs} words correct.`,
+        description: `You got ${wordsCorrect} out of ${gameState.totalPairs} words correct. Try again!`,
         type: 'error'
       });
       setShowTransition(true);
@@ -230,7 +247,7 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
           ...prev,
           gamePhase: 'feedback'
         }));
-      }, 2000);
+      }, 3000);
     }
   };
 
