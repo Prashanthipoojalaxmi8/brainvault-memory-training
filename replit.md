@@ -35,7 +35,6 @@ The application follows a full-stack architecture with:
 3. **Spatial Span Forward**: Letter sequence recall in original order
 4. **Spatial Span Backward**: Letter sequence recall in reverse order
 5. **Operation Span Task**: Math problems with word memorization and recall
-6. **Culture Fair Intelligence Test**: Visual puzzles including series completion, classification, matrices, and conditional reasoning
 
 ## Data Flow
 
@@ -90,6 +89,7 @@ The build process creates:
 
 ```
 Changelog:
+- July 09, 2025. Removed Culture Fair Intelligence Test as requested by user
 - July 09, 2025. Enhanced Culture Fair Intelligence Test with logical patterns and helpful hints
 - July 09, 2025. Added Culture Fair Intelligence Test with 5 visual puzzle types
 - July 02, 2025. Initial setup
