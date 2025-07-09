@@ -192,24 +192,24 @@ export function CultureFairGame({ onBackToMenu }: CultureFairGameProps) {
   const getVisualPattern = (question: CultureFairQuestion) => {
     switch (question.type) {
       case 'series':
-        if (question.id === 1) return '⬜ ◼️ ⬜ ◼️ ?';
-        if (question.id === 2) return '◆ ◇ ◆ ◇ ?';
-        if (question.id === 3) return '🔺 🔶 ⬟ ⬢ ?';
-        return '⬜ ◼️ ⬜ ?';
+        if (question.id === 1) return '◼️ ⬜ ◼️ ⬜ ?';
+        if (question.id === 2) return '● ⬤ 🔵 ?';
+        if (question.id === 3) return '🔺 ◼️ ⬟ ⬢ ?';
+        return '◼️ ⬜ ◼️ ?';
       case 'classification':
-        if (question.id === 4) return '🔺 🔺 🔺 ◼️';
-        if (question.id === 5) return '🔺 🔶 🔷 ◼️';
-        if (question.id === 6) return '▲ ▲ ▲ ▼';
-        return '🔺 🔺 ◼️ 🔺';
+        if (question.id === 4) return '🔺  🔺  🔺  ●';
+        if (question.id === 5) return '🔴  🔴  🔴  🔵';
+        if (question.id === 6) return '▲  ▲  ▲  ▼';
+        return '🔺  🔺  ●  🔺';
       case 'matrices':
-        if (question.id === 7) return '◼️ ⬜ → ◼️\n⬜ ◼️ → ⬜\n🔺 ◼️ → ?';
-        if (question.id === 8) return '🔸 🔹 🔷\n🔸 🔹 🔷\n🔸 🔹 ?';
-        if (question.id === 9) return '◆ ◇ ⬟\n◇ ⬟ 🔶\n⬟ 🔶 ?';
+        if (question.id === 7) return '⬜ + ◼️ = ◼️\n◼️ + ⬜ = ?\n🔺 + ◼️ = ?';
+        if (question.id === 8) return '🔸 🔹 🔷\n🔸 🔹 ?\nSmall→Med→Large';
+        if (question.id === 9) return '◆ ◇ ⬟\n◇ ⬟ ?\n0°→90°→180°';
         return '◼️ ⬜ ◼️\n⬜ ◼️ ⬜\n◼️ ⬜ ?';
       case 'conditions':
-        if (question.id === 10) return 'Rule: ▲ = filled, ▽ = empty\nWhich fits: ▲ ?';
-        if (question.id === 11) return 'Rule: ⬤ = small, ◼️ = large\nWhich fits: round ?';
-        if (question.id === 12) return 'Rule: >4 sides = blue, ≤4 sides = black\nWhich fits: hexagon ?';
+        if (question.id === 10) return 'Rule: ▲ UP = filled ▽ DOWN = empty\nWhich triangle follows this rule?';
+        if (question.id === 11) return 'Rule: ● circles = small ⬛ squares = large\nWhich shape follows this rule?';
+        if (question.id === 12) return 'Rule: 3-4 sides = red, 5+ sides = blue\nWhich shape follows this rule?';
         return 'Apply the rule → ?';
       default:
         return 'Pattern → ?';
@@ -241,34 +241,50 @@ export function CultureFairGame({ onBackToMenu }: CultureFairGameProps) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
                   <div className="bg-blue-50 p-4 rounded-lg">
                     <h3 className="font-bold text-blue-700 mb-2">🔗 Series Completion</h3>
-                    <p className="text-sm text-blue-600">
-                      Look at the sequence of shapes and find the pattern. 
-                      Determine what comes next in the series.
+                    <p className="text-sm text-blue-600 mb-2">
+                      Find logical patterns in sequences:
                     </p>
+                    <ul className="text-xs text-blue-500 space-y-1">
+                      <li>• Alternating patterns (filled/empty)</li>
+                      <li>• Size progression (small → large)</li>
+                      <li>• Shape complexity (sides increase)</li>
+                    </ul>
                   </div>
                   
                   <div className="bg-purple-50 p-4 rounded-lg">
                     <h3 className="font-bold text-purple-700 mb-2">🔍 Classification</h3>
-                    <p className="text-sm text-purple-600">
-                      Find the shape that doesn't belong with the others. 
-                      Look for differences in size, orientation, or type.
+                    <p className="text-sm text-purple-600 mb-2">
+                      Identify the odd one out:
                     </p>
+                    <ul className="text-xs text-purple-500 space-y-1">
+                      <li>• Different shape type</li>
+                      <li>• Different color</li>
+                      <li>• Different orientation</li>
+                    </ul>
                   </div>
                   
                   <div className="bg-orange-50 p-4 rounded-lg">
                     <h3 className="font-bold text-orange-700 mb-2">⬜ Matrices</h3>
-                    <p className="text-sm text-orange-600">
-                      Complete the pattern in the grid. 
-                      Look at how shapes change across rows and columns.
+                    <p className="text-sm text-orange-600 mb-2">
+                      Complete grid patterns:
                     </p>
+                    <ul className="text-xs text-orange-500 space-y-1">
+                      <li>• Row addition (combine features)</li>
+                      <li>• Column progression (size/rotation)</li>
+                      <li>• Logical combinations</li>
+                    </ul>
                   </div>
                   
                   <div className="bg-red-50 p-4 rounded-lg">
                     <h3 className="font-bold text-red-700 mb-2">⚖️ Conditions</h3>
-                    <p className="text-sm text-red-600">
-                      Apply the given rules to choose the correct shape. 
-                      Read the rule carefully and select the shape that fits.
+                    <p className="text-sm text-red-600 mb-2">
+                      Apply logical rules:
                     </p>
+                    <ul className="text-xs text-red-500 space-y-1">
+                      <li>• If-then conditions</li>
+                      <li>• Size/direction rules</li>
+                      <li>• Count-based rules</li>
+                    </ul>
                   </div>
                 </div>
                 

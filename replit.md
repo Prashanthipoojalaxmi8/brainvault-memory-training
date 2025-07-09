@@ -90,6 +90,7 @@ The build process creates:
 
 ```
 Changelog:
+- July 09, 2025. Enhanced Culture Fair Intelligence Test with logical patterns and helpful hints
 - July 09, 2025. Added Culture Fair Intelligence Test with 5 visual puzzle types
 - July 02, 2025. Initial setup
 ```

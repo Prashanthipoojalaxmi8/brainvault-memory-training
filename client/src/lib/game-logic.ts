@@ -205,12 +205,12 @@ export function validateWordRecall(userWords: string[], correctWords: string[]):
 // Culture Fair Intelligence Test functions
 export function generateCultureFairQuestions(): import('@shared/schema').CultureFairQuestion[] {
   const questionPool = [
-    // Series Completion Questions
+    // Series Completion Questions - Clear progressive patterns
     {
       id: 1,
       type: 'series',
-      title: 'Series Completion - Question 1',
-      description: 'Rule: Look at the pattern of shapes. Each shape alternates between filled and empty. What comes next?',
+      title: 'Series Completion - Basic Pattern',
+      description: 'Hint: Notice how shapes alternate between filled (black) and empty (white). The pattern repeats every 2 shapes. What comes after the white square?',
       options: ['◼️', '⬜', '🔺', '🔷'],
       correctAnswer: '◼️',
       difficulty: 1
@@ -218,66 +218,66 @@ export function generateCultureFairQuestions(): import('@shared/schema').Culture
     {
       id: 2,
       type: 'series',
-      title: 'Series Completion - Question 2',
-      description: 'Rule: The shapes rotate clockwise by 90 degrees each step. Continue the pattern.',
-      options: ['◆', '◇', '▲', '▼'],
-      correctAnswer: '▲',
+      title: 'Series Completion - Size Growth',
+      description: 'Hint: Each shape grows larger. Start with small, then medium, then large. The pattern shows: Small → Medium → Large → ?',
+      options: ['●', '⬤', '🔵', '🟦'],
+      correctAnswer: '🟦',
       difficulty: 2
     },
     {
       id: 3,
       type: 'series',
-      title: 'Series Completion - Question 3',
-      description: 'Rule: The number of sides increases by one each time. What shape comes next?',
-      options: ['⬟', '⬢', '🔺', '🔶'],
-      correctAnswer: '⬢',
+      title: 'Series Completion - Shape Sides',
+      description: 'Hint: Count the sides! Triangle (3) → Square (4) → Pentagon (5) → Hexagon (6) → ?',
+      options: ['⭐', '⬢', '🔺', '🔶'],
+      correctAnswer: '⭐',
       difficulty: 3
     },
     
-    // Classification Questions
+    // Classification Questions - Clear odd-one-out logic
     {
       id: 4,
       type: 'classification',
-      title: 'Classification - Question 1',
-      description: 'Rule: Find the shape that is different from the others. Three shapes share a common property.',
-      options: ['🔺', '🔺', '🔺', '◼️'],
-      correctAnswer: '◼️',
+      title: 'Classification - Shape Type',
+      description: 'Hint: Look at the shape types. Three are the same geometric shape, one is completely different. Which one is the odd shape?',
+      options: ['🔺', '🔺', '🔺', '●'],
+      correctAnswer: '●',
       difficulty: 1
     },
     {
       id: 5,
       type: 'classification',
-      title: 'Classification - Question 2',
-      description: 'Rule: One shape has a different number of sides. Which one does not belong?',
-      options: ['🔺', '🔶', '🔷', '◼️'],
-      correctAnswer: '◼️',
+      title: 'Classification - Color Pattern',
+      description: 'Hint: Three shapes share the same color, one has a different color. Which one stands out?',
+      options: ['🔴', '🔴', '🔴', '🔵'],
+      correctAnswer: '🔵',
       difficulty: 2
     },
     {
       id: 6,
       type: 'classification',
-      title: 'Classification - Question 3',
-      description: 'Rule: One shape is oriented differently. Which one is the odd one out?',
+      title: 'Classification - Orientation',
+      description: 'Hint: Check the direction each shape is pointing. Three point the same way, one points differently.',
       options: ['▲', '▲', '▲', '▼'],
       correctAnswer: '▼',
       difficulty: 3
     },
     
-    // Matrices Questions  
+    // Matrices Questions - Clear grid patterns
     {
       id: 7,
       type: 'matrices',
-      title: 'Matrices - Question 1',
-      description: 'Rule: In each row, the third shape combines elements from the first two. Complete the pattern.',
+      title: 'Matrices - Addition Pattern',
+      description: 'Hint: Look at each row. The third shape combines features from the first two. Row 1: Empty + Filled = Filled. Row 2: Filled + Empty = ?',
       options: ['◼️', '⬜', '🔺', '◆'],
-      correctAnswer: '◼️',
+      correctAnswer: '⬜',
       difficulty: 2
     },
     {
       id: 8,
       type: 'matrices',
-      title: 'Matrices - Question 2',
-      description: 'Rule: Each column shows the same shape getting progressively larger. What completes the pattern?',
+      title: 'Matrices - Column Pattern',
+      description: 'Hint: Each column shows the same shape in different sizes. Column 1: Small → Medium → Large. Column 2: follows the same pattern.',
       options: ['🔸', '🔹', '🔷', '⬛'],
       correctAnswer: '🔷',
       difficulty: 3
@@ -285,19 +285,19 @@ export function generateCultureFairQuestions(): import('@shared/schema').Culture
     {
       id: 9,
       type: 'matrices',
-      title: 'Matrices - Question 3',
-      description: 'Rule: The pattern rotates 45 degrees clockwise in each cell. Complete the sequence.',
+      title: 'Matrices - Rotation Pattern',
+      description: 'Hint: Shapes rotate clockwise. Row 1: 0° → 90° → 180°. Row 2: 0° → 90° → ? (What comes after 90°?)',
       options: ['◆', '◇', '⬟', '🔶'],
       correctAnswer: '◆',
       difficulty: 4
     },
     
-    // Conditions Questions
+    // Conditions Questions - Clear logical rules
     {
       id: 10,
       type: 'conditions',
-      title: 'Conditions - Question 1',
-      description: 'Rule: If the shape is pointed upward, it must be filled. If pointed downward, it must be empty.',
+      title: 'Conditions - Direction Rule',
+      description: 'Hint: The rule is simple - if a triangle points UP, it must be filled (black). If it points DOWN, it must be empty (white). Which triangle follows this rule?',
       options: ['▲', '▽', '🔺', '🔻'],
       correctAnswer: '▲',
       difficulty: 2
@@ -305,19 +305,19 @@ export function generateCultureFairQuestions(): import('@shared/schema').Culture
     {
       id: 11,
       type: 'conditions',
-      title: 'Conditions - Question 2',
-      description: 'Rule: Round shapes must be small, angular shapes must be large. Which shape fits?',
-      options: ['⬤', '🔷', '◼️', '🔸'],
-      correctAnswer: '⬤',
+      title: 'Conditions - Size Rule',
+      description: 'Hint: The rule states - circles must be small (●), squares must be large (⬛). Which shape correctly follows this size rule?',
+      options: ['●', '⬛', '🔵', '◼️'],
+      correctAnswer: '●',
       difficulty: 3
     },
     {
       id: 12,
       type: 'conditions',
-      title: 'Conditions - Question 3',
-      description: 'Rule: If a shape has more than 4 sides, it must be blue. If 4 or fewer sides, it must be black.',
-      options: ['🔷', '◼️', '🔺', '⬛'],
-      correctAnswer: '🔷',
+      title: 'Conditions - Sides Rule',
+      description: 'Hint: Count the sides! Rule: Shapes with 3-4 sides must be red, shapes with 5+ sides must be blue. Which shape follows this rule?',
+      options: ['🔴', '🔵', '🟡', '🟢'],
+      correctAnswer: '🔴',
       difficulty: 4
     }
   ];
