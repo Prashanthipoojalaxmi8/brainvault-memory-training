@@ -131,9 +131,9 @@ export function generateMathQuestion(level: number): { question: string; answer:
     
     if (op === '/') {
       // Generate division that results in whole numbers
-      answer = b;
-      a = answer * a; // Make sure a is divisible by b
-      question = `${a} ${op} ${b}`;
+      const dividend = a * b; // Make sure dividend is divisible by b
+      question = `${dividend} ${op} ${b}`;
+      answer = dividend / b; // This should equal a
     } else {
       question = `${a} ${op} ${b}`;
       answer = a * b;
@@ -179,27 +179,40 @@ export function validateMathAnswer(userAnswer: string, correctAnswer: number): b
 }
 
 export function validateWordRecall(userWords: string[], correctWords: string[]): number {
+  console.log('DEBUG validateWordRecall:', {
+    userWords,
+    correctWords,
+    userWordsLength: userWords.length,
+    correctWordsLength: correctWords.length
+  });
+  
   const userCleaned = userWords.map(w => w.trim().toLowerCase()).filter(w => w.length > 0);
-  const correctCleaned = correctWords.map(w => w.toLowerCase());
+  const correctCleaned = correctWords.map(w => w.trim().toLowerCase());
   
-  // For Operation Span Task, we need strict validation:
-  // 1. User must provide exactly the same number of words
-  // 2. All words must be in the exact correct order
-  // 3. Only award points if the complete sequence is perfect
+  console.log('DEBUG cleaned words:', {
+    userCleaned,
+    correctCleaned
+  });
   
-  if (userCleaned.length !== correctCleaned.length) {
-    return 0; // Wrong number of words = 0 points
-  }
+  // Count how many words are correct in the right position
+  let correctCount = 0;
+  const minLength = Math.min(userCleaned.length, correctCleaned.length);
   
-  // Check if all words match in exact order
-  for (let i = 0; i < correctCleaned.length; i++) {
-    if (userCleaned[i] !== correctCleaned[i]) {
-      return 0; // Any word wrong = 0 points
+  for (let i = 0; i < minLength; i++) {
+    if (userCleaned[i] === correctCleaned[i]) {
+      correctCount++;
     }
   }
   
-  // Perfect match = full points
-  return correctCleaned.length;
+  console.log('DEBUG validation result:', {
+    correctCount,
+    minLength,
+    totalExpected: correctCleaned.length
+  });
+  
+  // For Operation Span Task, we need all words to be correct in order
+  // But we'll return the count of correct words for partial credit
+  return correctCount === correctCleaned.length ? correctCleaned.length : 0;
 }
 
 

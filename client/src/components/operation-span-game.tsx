@@ -156,10 +156,10 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
   const handleRecallSubmit = () => {
     const userWords = gameState.userRecallInput
       .split(',')
-      .map(word => word.trim().toLowerCase())
+      .map(word => word.trim())
       .filter(word => word.length > 0);
     
-    const correctWords = gameState.rememberedWords.map(word => word.toLowerCase());
+    const correctWords = gameState.rememberedWords;
     const wordsCorrect = validateWordRecall(userWords, correctWords);
     const isLevelComplete = wordsCorrect === gameState.totalPairs;
     
@@ -221,7 +221,22 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
           }));
         } else {
           // Game complete
-          updateGameResult('operation-span', newScore, newLevel);
+          console.log('DEBUG Game Complete - updating result:', {
+            mode: 'operation-span',
+            level: newLevel,
+            score: newScore,
+            mathCorrect: gameState.stats.mathCorrect,
+            mathIncorrect: gameState.stats.mathIncorrect,
+            wordsCorrect: gameState.stats.wordsCorrect
+          });
+          updateGameResult(
+            'operation-span', 
+            newLevel, 
+            newScore, 
+            gameState.stats.wordsCorrect, 
+            gameState.stats.mathIncorrect, 
+            gameState.stats.totalTime
+          );
           setGameState(prev => ({
             ...prev,
             currentScore: newScore,
@@ -242,7 +257,22 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
       
       setTimeout(() => {
         setShowTransition(false);
-        updateGameResult('operation-span', gameState.currentScore, gameState.currentLevel);
+        console.log('DEBUG Level Failed - updating result:', {
+          mode: 'operation-span',
+          level: gameState.currentLevel,
+          score: gameState.currentScore,
+          mathCorrect: gameState.stats.mathCorrect,
+          mathIncorrect: gameState.stats.mathIncorrect,
+          wordsCorrect: gameState.stats.wordsCorrect
+        });
+        updateGameResult(
+          'operation-span', 
+          gameState.currentLevel, 
+          gameState.currentScore, 
+          gameState.stats.wordsCorrect, 
+          gameState.stats.mathIncorrect, 
+          gameState.stats.totalTime
+        );
         setGameState(prev => ({
           ...prev,
           gamePhase: 'feedback'
@@ -484,8 +514,11 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
             <CardContent className="p-6">
               <div className="text-center mb-6">
                 <h2 className="text-xl font-bold mb-2">Recall All Words</h2>
-                <p className="text-gray-600">
+                <p className="text-gray-600 mb-2">
                   Enter all {gameState.totalPairs} words you remember, separated by commas
+                </p>
+                <p className="text-sm text-gray-500">
+                  Remember the words in the order they appeared
                 </p>
               </div>
               
@@ -494,9 +527,12 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
                   value={gameState.userRecallInput}
                   onChange={(e) => setGameState(prev => ({ ...prev, userRecallInput: e.target.value }))}
                   onKeyPress={(e) => handleKeyPress(e, handleRecallSubmit)}
-                  placeholder="word1, word2, word3..."
+                  placeholder="Apple, Chair, Tree..."
                   className="text-center text-lg max-w-md mx-auto"
                 />
+                <p className="text-xs text-gray-500 mt-2">
+                  Tip: Enter words in the same order they appeared
+                </p>
               </div>
               
               <div className="flex justify-center">
