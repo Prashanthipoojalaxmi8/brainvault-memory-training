@@ -179,7 +179,7 @@ export function validateMathAnswer(userAnswer: string, correctAnswer: number): b
 }
 
 export function validateWordRecall(userWords: string[], correctWords: string[]): number {
-  console.log('DEBUG validateWordRecall:', {
+  console.log('DEBUG validateWordRecall INPUT:', {
     userWords,
     correctWords,
     userWordsLength: userWords.length,
@@ -198,21 +198,30 @@ export function validateWordRecall(userWords: string[], correctWords: string[]):
   let correctCount = 0;
   const minLength = Math.min(userCleaned.length, correctCleaned.length);
   
+  // Detailed validation logging
   for (let i = 0; i < minLength; i++) {
-    if (userCleaned[i] === correctCleaned[i]) {
+    const match = userCleaned[i] === correctCleaned[i];
+    console.log(`DEBUG word ${i}: "${userCleaned[i]}" vs "${correctCleaned[i]}" = ${match}`);
+    if (match) {
       correctCount++;
     }
+  }
+  
+  // Check if user provided too many or too few words
+  if (userCleaned.length !== correctCleaned.length) {
+    console.log('DEBUG length mismatch - user provided', userCleaned.length, 'expected', correctCleaned.length);
   }
   
   console.log('DEBUG validation result:', {
     correctCount,
     minLength,
-    totalExpected: correctCleaned.length
+    totalExpected: correctCleaned.length,
+    perfectMatch: correctCount === correctCleaned.length && userCleaned.length === correctCleaned.length
   });
   
-  // For Operation Span Task, we need all words to be correct in order
-  // But we'll return the count of correct words for partial credit
-  return correctCount === correctCleaned.length ? correctCleaned.length : 0;
+  // For Operation Span Task, we need all words to be correct in order AND the right number of words
+  const isComplete = correctCount === correctCleaned.length && userCleaned.length === correctCleaned.length;
+  return isComplete ? correctCleaned.length : 0;
 }
 
 

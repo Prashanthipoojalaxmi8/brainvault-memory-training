@@ -86,6 +86,10 @@ export interface OperationSpanState {
     totalTime: number;
     attempts: number;
   };
+  mistakes: {
+    mathErrors: Array<{ level: number; question: string; userAnswer: string; correctAnswer: number }>;
+    wordErrors: Array<{ level: number; userWords: string[]; correctWords: string[]; correctCount: number }>;
+  };
 }
 
 

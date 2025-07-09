@@ -52,6 +52,10 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
       wordsCorrect: 0,
       totalTime: 0,
       attempts: 0
+    },
+    mistakes: {
+      mathErrors: [],
+      wordErrors: []
     }
   });
 
@@ -91,13 +95,25 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
       isCorrect
     });
     
-    // Update stats
+    // Update stats and track mistakes
     setGameState(prev => ({
       ...prev,
       stats: {
         ...prev.stats,
         mathCorrect: prev.stats.mathCorrect + (isCorrect ? 1 : 0),
         mathIncorrect: prev.stats.mathIncorrect + (isCorrect ? 0 : 1)
+      },
+      mistakes: {
+        ...prev.mistakes,
+        mathErrors: isCorrect ? prev.mistakes.mathErrors : [
+          ...prev.mistakes.mathErrors,
+          {
+            level: prev.currentLevel,
+            question: currentMathData.question,
+            userAnswer: prev.userMathInput,
+            correctAnswer: currentMathData.answer
+          }
+        ]
       }
     }));
 
@@ -171,13 +187,25 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
       isLevelComplete
     });
     
-    // Update stats first
+    // Update stats and track mistakes
     setGameState(prev => ({
       ...prev,
       stats: {
         ...prev.stats,
         wordsCorrect: prev.stats.wordsCorrect + wordsCorrect,
         attempts: prev.stats.attempts + 1
+      },
+      mistakes: {
+        ...prev.mistakes,
+        wordErrors: isLevelComplete ? prev.mistakes.wordErrors : [
+          ...prev.mistakes.wordErrors,
+          {
+            level: prev.currentLevel,
+            userWords: userWords,
+            correctWords: correctWords,
+            correctCount: wordsCorrect
+          }
+        ]
       }
     }));
 
@@ -310,6 +338,10 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
         wordsCorrect: 0,
         totalTime: 0,
         attempts: 0
+      },
+      mistakes: {
+        mathErrors: [],
+        wordErrors: []
       }
     });
   };
@@ -571,6 +603,48 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
                   <div className="text-sm text-gray-600">Words Correct</div>
                 </div>
               </div>
+
+              {/* Mistake Summary */}
+              {(gameState.mistakes.mathErrors.length > 0 || gameState.mistakes.wordErrors.length > 0) && (
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold mb-4 text-center">Mistake Summary</h3>
+                  
+                  {gameState.mistakes.mathErrors.length > 0 && (
+                    <div className="mb-4">
+                      <h4 className="font-medium text-red-600 mb-2">Math Errors:</h4>
+                      <div className="space-y-2">
+                        {gameState.mistakes.mathErrors.map((error, index) => (
+                          <div key={index} className="bg-red-50 p-3 rounded text-sm">
+                            <div className="font-medium">Level {error.level}: {error.question}</div>
+                            <div className="text-red-700">
+                              Your answer: {error.userAnswer} | Correct answer: {error.correctAnswer}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {gameState.mistakes.wordErrors.length > 0 && (
+                    <div className="mb-4">
+                      <h4 className="font-medium text-orange-600 mb-2">Word Recall Errors:</h4>
+                      <div className="space-y-2">
+                        {gameState.mistakes.wordErrors.map((error, index) => (
+                          <div key={index} className="bg-orange-50 p-3 rounded text-sm">
+                            <div className="font-medium">Level {error.level}: {error.correctCount}/{error.correctWords.length} correct</div>
+                            <div className="text-orange-700">
+                              Your words: {error.userWords.join(', ')}
+                            </div>
+                            <div className="text-orange-700">
+                              Correct words: {error.correctWords.join(', ')}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
               
               <div className="flex justify-center gap-4">
                 <Button onClick={resetGame} className="bg-purple-600 hover:bg-purple-700">
