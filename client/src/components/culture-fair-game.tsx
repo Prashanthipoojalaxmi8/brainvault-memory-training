@@ -17,7 +17,7 @@ interface CultureFairGameProps {
 const initialState: CultureFairState = {
   currentQuestion: 0,
   currentScore: 0,
-  totalQuestions: 5,
+  totalQuestions: 8,
   gamePhase: 'question',
   selectedAnswer: null,
   timeRemaining: 30,
@@ -33,6 +33,7 @@ export function CultureFairGame({ onBackToMenu }: CultureFairGameProps) {
   const [gameState, setGameState] = useState<CultureFairState>(initialState);
   const [questions] = useState<CultureFairQuestion[]>(generateCultureFairQuestions());
   const [showTransition, setShowTransition] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(true);
   const [transitionData, setTransitionData] = useState<{
     title: string;
     description: string;
@@ -160,6 +161,11 @@ export function CultureFairGame({ onBackToMenu }: CultureFairGameProps) {
     setGameState(initialState);
     setPreviousScore(0);
     setShowTransition(false);
+    setShowInstructions(true);
+  };
+
+  const startGame = () => {
+    setShowInstructions(false);
   };
 
   const getDifficultyColor = (difficulty: number) => {
@@ -182,6 +188,115 @@ export function CultureFairGame({ onBackToMenu }: CultureFairGameProps) {
       default: return '❓';
     }
   };
+
+  const getVisualPattern = (question: CultureFairQuestion) => {
+    switch (question.type) {
+      case 'series':
+        if (question.id === 1) return '⬜ ◼️ ⬜ ◼️ ?';
+        if (question.id === 2) return '◆ ◇ ◆ ◇ ?';
+        if (question.id === 3) return '🔺 🔶 ⬟ ⬢ ?';
+        return '⬜ ◼️ ⬜ ?';
+      case 'classification':
+        if (question.id === 4) return '🔺 🔺 🔺 ◼️';
+        if (question.id === 5) return '🔺 🔶 🔷 ◼️';
+        if (question.id === 6) return '▲ ▲ ▲ ▼';
+        return '🔺 🔺 ◼️ 🔺';
+      case 'matrices':
+        if (question.id === 7) return '◼️ ⬜ → ◼️\n⬜ ◼️ → ⬜\n🔺 ◼️ → ?';
+        if (question.id === 8) return '🔸 🔹 🔷\n🔸 🔹 🔷\n🔸 🔹 ?';
+        if (question.id === 9) return '◆ ◇ ⬟\n◇ ⬟ 🔶\n⬟ 🔶 ?';
+        return '◼️ ⬜ ◼️\n⬜ ◼️ ⬜\n◼️ ⬜ ?';
+      case 'conditions':
+        if (question.id === 10) return 'Rule: ▲ = filled, ▽ = empty\nWhich fits: ▲ ?';
+        if (question.id === 11) return 'Rule: ⬤ = small, ◼️ = large\nWhich fits: round ?';
+        if (question.id === 12) return 'Rule: >4 sides = blue, ≤4 sides = black\nWhich fits: hexagon ?';
+        return 'Apply the rule → ?';
+      default:
+        return 'Pattern → ?';
+    }
+  };
+
+  // Instructions Screen
+  if (showInstructions) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-4">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center mb-8"
+          >
+            <Card className="p-8">
+              <CardHeader>
+                <CardTitle className="text-3xl font-bold text-green-600 flex items-center justify-center gap-2">
+                  <Brain className="w-8 h-8" />
+                  Culture Fair Intelligence Test
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="text-lg text-gray-700 mb-6">
+                  This test measures your ability to solve visual puzzles without relying on language or cultural knowledge.
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                  <div className="bg-blue-50 p-4 rounded-lg">
+                    <h3 className="font-bold text-blue-700 mb-2">🔗 Series Completion</h3>
+                    <p className="text-sm text-blue-600">
+                      Look at the sequence of shapes and find the pattern. 
+                      Determine what comes next in the series.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-purple-50 p-4 rounded-lg">
+                    <h3 className="font-bold text-purple-700 mb-2">🔍 Classification</h3>
+                    <p className="text-sm text-purple-600">
+                      Find the shape that doesn't belong with the others. 
+                      Look for differences in size, orientation, or type.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-orange-50 p-4 rounded-lg">
+                    <h3 className="font-bold text-orange-700 mb-2">⬜ Matrices</h3>
+                    <p className="text-sm text-orange-600">
+                      Complete the pattern in the grid. 
+                      Look at how shapes change across rows and columns.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-red-50 p-4 rounded-lg">
+                    <h3 className="font-bold text-red-700 mb-2">⚖️ Conditions</h3>
+                    <p className="text-sm text-red-600">
+                      Apply the given rules to choose the correct shape. 
+                      Read the rule carefully and select the shape that fits.
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="bg-yellow-50 p-4 rounded-lg">
+                  <h3 className="font-bold text-yellow-700 mb-2">📝 Test Instructions</h3>
+                  <ul className="text-sm text-yellow-600 space-y-1">
+                    <li>• You have 30 seconds per question</li>
+                    <li>• Read each rule carefully before selecting your answer</li>
+                    <li>• 8 questions total with progressive difficulty</li>
+                    <li>• Your IQ score will be calculated based on performance</li>
+                  </ul>
+                </div>
+                
+                <div className="flex gap-4 justify-center">
+                  <Button onClick={startGame} size="lg" className="bg-green-600 hover:bg-green-700">
+                    Start Test
+                  </Button>
+                  <Button onClick={onBackToMenu} variant="outline" size="lg">
+                    Back to Menu
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
 
   if (gameState.gamePhase === 'complete') {
     const finalScore = calculateCultureFairScore(gameState.stats.correct, gameState.totalQuestions);
@@ -302,11 +417,8 @@ export function CultureFairGame({ onBackToMenu }: CultureFairGameProps) {
                   {/* Visual Pattern Display */}
                   <div className="bg-gray-50 p-8 rounded-lg mb-6">
                     <div className="text-center">
-                      <div className="text-6xl mb-4">
-                        {currentQuestion.type === 'series' && '⬜ ◼️ ⬜ ?'}
-                        {currentQuestion.type === 'classification' && '🔺 🔺 ◼️ 🔺'}
-                        {currentQuestion.type === 'matrices' && '⬜ ◼️\n◼️ ?'}
-                        {currentQuestion.type === 'conditions' && '⚖️ → ?'}
+                      <div className="text-4xl mb-4 whitespace-pre-line font-mono">
+                        {getVisualPattern(currentQuestion)}
                       </div>
                       <div className="text-sm text-gray-500">
                         {currentQuestion.type === 'series' && 'Find the pattern and select what comes next'}

@@ -204,53 +204,140 @@ export function validateWordRecall(userWords: string[], correctWords: string[]):
 
 // Culture Fair Intelligence Test functions
 export function generateCultureFairQuestions(): import('@shared/schema').CultureFairQuestion[] {
-  return [
+  const questionPool = [
+    // Series Completion Questions
     {
       id: 1,
       type: 'series',
       title: 'Series Completion - Question 1',
-      description: 'Look at the sequence and find the pattern. What comes next?',
-      options: ['◼️', '⬜', '🔺', '❓'],
+      description: 'Rule: Look at the pattern of shapes. Each shape alternates between filled and empty. What comes next?',
+      options: ['◼️', '⬜', '🔺', '🔷'],
       correctAnswer: '◼️',
       difficulty: 1
     },
     {
       id: 2,
-      type: 'classification',
-      title: 'Classifications - Question 2',
-      description: 'One of these shapes does not belong with the others. Which one is different?',
-      options: ['🔺', '◼️', '⬜', '🔵'],
-      correctAnswer: '◼️',
+      type: 'series',
+      title: 'Series Completion - Question 2',
+      description: 'Rule: The shapes rotate clockwise by 90 degrees each step. Continue the pattern.',
+      options: ['◆', '◇', '▲', '▼'],
+      correctAnswer: '▲',
       difficulty: 2
     },
     {
       id: 3,
-      type: 'matrices',
-      title: 'Matrices - Question 3',
-      description: 'Complete the pattern in the grid. What goes in the missing space?',
-      options: ['⬜', '◼️', '🔺', '🔵'],
-      correctAnswer: '🔺',
+      type: 'series',
+      title: 'Series Completion - Question 3',
+      description: 'Rule: The number of sides increases by one each time. What shape comes next?',
+      options: ['⬟', '⬢', '🔺', '🔶'],
+      correctAnswer: '⬢',
       difficulty: 3
     },
+    
+    // Classification Questions
     {
       id: 4,
-      type: 'conditions',
-      title: 'Conditions - Question 4',
-      description: 'Apply the given rules to determine which shape fits the conditions.',
-      options: ['▲', '⬛', '🔵', '⬤'],
-      correctAnswer: '⬤',
-      difficulty: 4
+      type: 'classification',
+      title: 'Classification - Question 1',
+      description: 'Rule: Find the shape that is different from the others. Three shapes share a common property.',
+      options: ['🔺', '🔺', '🔺', '◼️'],
+      correctAnswer: '◼️',
+      difficulty: 1
     },
     {
       id: 5,
-      type: 'series',
-      title: 'Series Completion - Question 5',
-      description: 'Find the next item in this advanced pattern sequence.',
-      options: ['🔷', '🔸', '🔹', '⬛'],
+      type: 'classification',
+      title: 'Classification - Question 2',
+      description: 'Rule: One shape has a different number of sides. Which one does not belong?',
+      options: ['🔺', '🔶', '🔷', '◼️'],
+      correctAnswer: '◼️',
+      difficulty: 2
+    },
+    {
+      id: 6,
+      type: 'classification',
+      title: 'Classification - Question 3',
+      description: 'Rule: One shape is oriented differently. Which one is the odd one out?',
+      options: ['▲', '▲', '▲', '▼'],
+      correctAnswer: '▼',
+      difficulty: 3
+    },
+    
+    // Matrices Questions  
+    {
+      id: 7,
+      type: 'matrices',
+      title: 'Matrices - Question 1',
+      description: 'Rule: In each row, the third shape combines elements from the first two. Complete the pattern.',
+      options: ['◼️', '⬜', '🔺', '◆'],
+      correctAnswer: '◼️',
+      difficulty: 2
+    },
+    {
+      id: 8,
+      type: 'matrices',
+      title: 'Matrices - Question 2',
+      description: 'Rule: Each column shows the same shape getting progressively larger. What completes the pattern?',
+      options: ['🔸', '🔹', '🔷', '⬛'],
       correctAnswer: '🔷',
-      difficulty: 5
+      difficulty: 3
+    },
+    {
+      id: 9,
+      type: 'matrices',
+      title: 'Matrices - Question 3',
+      description: 'Rule: The pattern rotates 45 degrees clockwise in each cell. Complete the sequence.',
+      options: ['◆', '◇', '⬟', '🔶'],
+      correctAnswer: '◆',
+      difficulty: 4
+    },
+    
+    // Conditions Questions
+    {
+      id: 10,
+      type: 'conditions',
+      title: 'Conditions - Question 1',
+      description: 'Rule: If the shape is pointed upward, it must be filled. If pointed downward, it must be empty.',
+      options: ['▲', '▽', '🔺', '🔻'],
+      correctAnswer: '▲',
+      difficulty: 2
+    },
+    {
+      id: 11,
+      type: 'conditions',
+      title: 'Conditions - Question 2',
+      description: 'Rule: Round shapes must be small, angular shapes must be large. Which shape fits?',
+      options: ['⬤', '🔷', '◼️', '🔸'],
+      correctAnswer: '⬤',
+      difficulty: 3
+    },
+    {
+      id: 12,
+      type: 'conditions',
+      title: 'Conditions - Question 3',
+      description: 'Rule: If a shape has more than 4 sides, it must be blue. If 4 or fewer sides, it must be black.',
+      options: ['🔷', '◼️', '🔺', '⬛'],
+      correctAnswer: '🔷',
+      difficulty: 4
     }
   ];
+  
+  // Randomly select 8 questions from the pool, ensuring variety
+  const selectedQuestions = [];
+  const typeGroups = {
+    series: questionPool.filter(q => q.type === 'series'),
+    classification: questionPool.filter(q => q.type === 'classification'),
+    matrices: questionPool.filter(q => q.type === 'matrices'),
+    conditions: questionPool.filter(q => q.type === 'conditions')
+  };
+  
+  // Select 2 questions from each type
+  Object.values(typeGroups).forEach(typeQuestions => {
+    const shuffled = [...typeQuestions].sort(() => Math.random() - 0.5);
+    selectedQuestions.push(...shuffled.slice(0, 2));
+  });
+  
+  return selectedQuestions.sort(() => Math.random() - 0.5);
 }
 
 export function calculateCultureFairScore(correct: number, total: number): number {
