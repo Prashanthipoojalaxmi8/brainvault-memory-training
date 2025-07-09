@@ -201,3 +201,64 @@ export function validateWordRecall(userWords: string[], correctWords: string[]):
   // Perfect match = full points
   return correctCleaned.length;
 }
+
+// Culture Fair Intelligence Test functions
+export function generateCultureFairQuestions(): import('@shared/schema').CultureFairQuestion[] {
+  return [
+    {
+      id: 1,
+      type: 'series',
+      title: 'Series Completion - Question 1',
+      description: 'Look at the sequence and find the pattern. What comes next?',
+      options: ['◼️', '⬜', '🔺', '❓'],
+      correctAnswer: '◼️',
+      difficulty: 1
+    },
+    {
+      id: 2,
+      type: 'classification',
+      title: 'Classifications - Question 2',
+      description: 'One of these shapes does not belong with the others. Which one is different?',
+      options: ['🔺', '◼️', '⬜', '🔵'],
+      correctAnswer: '◼️',
+      difficulty: 2
+    },
+    {
+      id: 3,
+      type: 'matrices',
+      title: 'Matrices - Question 3',
+      description: 'Complete the pattern in the grid. What goes in the missing space?',
+      options: ['⬜', '◼️', '🔺', '🔵'],
+      correctAnswer: '🔺',
+      difficulty: 3
+    },
+    {
+      id: 4,
+      type: 'conditions',
+      title: 'Conditions - Question 4',
+      description: 'Apply the given rules to determine which shape fits the conditions.',
+      options: ['▲', '⬛', '🔵', '⬤'],
+      correctAnswer: '⬤',
+      difficulty: 4
+    },
+    {
+      id: 5,
+      type: 'series',
+      title: 'Series Completion - Question 5',
+      description: 'Find the next item in this advanced pattern sequence.',
+      options: ['🔷', '🔸', '🔹', '⬛'],
+      correctAnswer: '🔷',
+      difficulty: 5
+    }
+  ];
+}
+
+export function calculateCultureFairScore(correct: number, total: number): number {
+  const percentage = (correct / total) * 100;
+  // IQ scoring: 80 base + 10 points per correct answer
+  return Math.round(80 + (percentage * 0.4));
+}
+
+export function validateCultureFairAnswer(userAnswer: string, correctAnswer: string): boolean {
+  return userAnswer.trim() === correctAnswer.trim();
+}

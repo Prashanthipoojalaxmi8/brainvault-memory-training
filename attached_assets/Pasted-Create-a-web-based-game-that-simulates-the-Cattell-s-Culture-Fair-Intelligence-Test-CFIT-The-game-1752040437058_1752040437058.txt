@@ -1,0 +1,112 @@
+Create a web-based game that simulates the Cattell’s Culture Fair Intelligence Test (CFIT). The game should include 4 types of non-verbal subtests: Series Completion, Classifications, Matrices, and Conditions. Each subtest should display visual puzzles using abstract shapes or patterns. Users should be able to select their answers from multiple choices. Track and display the score at the end, and make it visually engaging and intuitive to use. Use HTML, CSS, and JavaScript (no external frameworks required unless necessary)."
+
+🧠 Key Features to Include in the Game:
+1. Home Screen
+Title: “Culture Fair Intelligence Test”
+
+Buttons: “Start Test”, “Instructions”, “View Score”
+
+2. Instructions Page
+Explain each subtest type simply (like your description above).
+
+3. Gameplay Flow
+Each subtest appears one after another.
+
+3–5 questions per subtest (Series Completion, Classifications, Matrices, Conditions).
+
+Questions are visual puzzles using shapes (SVG or images).
+
+Multiple choice options (A, B, C, D).
+
+4. Score System
++1 for each correct answer.
+
+Display total at the end with a simulated "IQ-like score" (e.g., scaled out of 160).
+
+5. Technologies
+HTML: structure (buttons, question layout)
+
+CSS: visuals (clean, minimal, with visual focus on puzzles)
+
+JavaScript: game logic, transitions, scoring, randomization
+
+🔧 Optional Enhancements:
+Timer per question (optional)
+
+LocalStorage to save high scores
+
+Progress bar
+
+Animated transitions
+
+Dark mode
+
+Would you like me to generate the starter HTML/JS/CSS code for the first subtest (e.g., Series Completion) right away? Or do you want a full project scaffold you can directly run in Replit?
+
+
+
+
+
+
+
+
+Ask ChatGPT
+You said:
+yeah I want a full project scallfold you can directly run in replit
+
+
+ChatGPT said:
+Culture Fair Iq Game
+
+
+Answer in chat instead
+Your Culture Fair Intelligence Test game scaffold is ready to run on Replit! 🎮
+
+✅ What’s Included:
+Home screen with Start and Instructions
+
+Four example questions across the CFIT subtests:
+
+Series Completion
+
+Classifications
+
+Matrices
+
+Conditions
+
+Score tracking + estimated IQ output
+
+Clean UI with HTML/CSS/JS (no external frameworks)
+
+🚀 To Use on Replit:
+Go to https://replit.com/
+
+Create a new HTML/CSS/JS project
+
+Paste the full code into the index.html file
+
+Click “Run” and enjoy!
+
+Would you like me to:
+
+Add more questions for each subtest?
+
+Enhance it with a timer, sound effects, or local high score storage?
+
+Replace placeholder images with real logic puzzles using SVG?
+
+Let me know how you'd like to evolve this!
+
+
+
+
+
+
+
+
+
+
+Tools
+
+

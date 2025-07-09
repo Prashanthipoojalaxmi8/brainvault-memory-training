@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Culture Fair Intelligence Test</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 600px;
+      padding: 2rem;
+      text-align: center;
+    }
+    h1 {
+      font-size: 1.8rem;
+    }
+    button {
+      padding: 0.6rem 1.2rem;
+      margin: 0.5rem;
+      border: none;
+      border-radius: 10px;
+      background-color: #4a90e2;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .question-image {
+      width: 100%;
+      margin: 1rem 0;
+    }
+    .options {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .option {
+      background-color: #ddd;
+      margin: 0.5rem;
+      padding: 1rem;
+      border-radius: 10px;
+      width: 100px;
+      cursor: pointer;
+    }
+    .hidden {
+      display: none;
+    }
+    .result {
+      font-size: 1.2rem;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="app">
+    <div id="home-screen">
+      <h1>Culture Fair Intelligence Test</h1>
+      <button onclick="startTest()">Start Test</button>
+      <button onclick="showInstructions()">Instructions</button>
+    </div>
+
+    <div id="instructions-screen" class="hidden">
+      <h2>Instructions</h2>
+      <p>This test includes 4 visual puzzle types:</p>
+      <ul style="text-align: left;">
+        <li><strong>Series Completion</strong> – Find the next item in a visual pattern.</li>
+        <li><strong>Classifications</strong> – Pick the odd one out.</li>
+        <li><strong>Matrices</strong> – Complete the grid pattern.</li>
+        <li><strong>Conditions</strong> – Apply rules to choose the right shape.</li>
+      </ul>
+      <button onclick="backToHome()">Back</button>
+    </div>
+
+    <div id="quiz-screen" class="hidden">
+      <h2 id="question-title"></h2>
+      <img id="question-image" class="question-image" src="" alt="Puzzle">
+      <div class="options" id="options"></div>
+    </div>
+
+    <div id="result-screen" class="hidden">
+      <h2>Test Complete!</h2>
+      <p class="result" id="score-display"></p>
+      <button onclick="backToHome()">Back to Home</button>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        type: 'Series Completion',
+        title: 'Series Completion - Q1',
+        image: 'https://via.placeholder.com/400x150?text=⬜+◼️+⬜+?',
+        options: ['◼️', '⬜', '🔺', '❓'],
+        answer: '◼️'
+      },
+      {
+        type: 'Classifications',
+        title: 'Classifications - Q2',
+        image: 'https://via.placeholder.com/400x150?text=🔺+🔺+◼️+🔺',
+        options: ['🔺', '◼️', '⬜', '🔵'],
+        answer: '◼️'
+      },
+      {
+        type: 'Matrices',
+        title: 'Matrices - Q3',
+        image: 'https://via.placeholder.com/400x150?text=Matrix+Pattern',
+        options: ['A', 'B', 'C', 'D'],
+        answer: 'C'
+      },
+      {
+        type: 'Conditions',
+        title: 'Conditions - Q4',
+        image: 'https://via.placeholder.com/400x150?text=Condition+Logic',
+        options: ['▲', '⬛', '🔵', '⬤'],
+        answer: '⬤'
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    function startTest() {
+      document.getElementById('home-screen').classList.add('hidden');
+      document.getElementById('instructions-screen').classList.add('hidden');
+      document.getElementById('quiz-screen').classList.remove('hidden');
+      loadQuestion();
+    }
+
+    function showInstructions() {
+      document.getElementById('home-screen').classList.add('hidden');
+      document.getElementById('instructions-screen').classList.remove('hidden');
+    }
+
+    function backToHome() {
+      document.getElementById('home-screen').classList.remove('hidden');
+      document.getElementById('instructions-screen').classList.add('hidden');
+      document.getElementById('quiz-screen').classList.add('hidden');
+      document.getElementById('result-screen').classList.add('hidden');
+      currentQuestion = 0;
+      score = 0;
+    }
+
+    function loadQuestion() {
+      const q = questions[currentQuestion];
+      document.getElementById('question-title').textContent = q.title;
+      document.getElementById('question-image').src = q.image;
+      const optionsDiv = document.getElementById('options');
+      optionsDiv.innerHTML = '';
+      q.options.forEach(opt => {
+        const btn = document.createElement('div');
+        btn.className = 'option';
+        btn.textContent = opt;
+        btn.onclick = () => checkAnswer(opt);
+        optionsDiv.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selected) {
+      if (selected === questions[currentQuestion].answer) {
+        score++;
+      }
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        loadQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function showResult() {
+      document.getElementById('quiz-screen').classList.add('hidden');
+      document.getElementById('result-screen').classList.remove('hidden');
+      document.getElementById('score-display').textContent = `You scored ${score} out of ${questions.length}. IQ Estimate: ${80 + score * 10}`;
+    }
+  </script>
+</body>
+</html>

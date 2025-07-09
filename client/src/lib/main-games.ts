@@ -14,6 +14,13 @@ export const MAIN_GAMES: Record<MainGame, MainGameConfig> = {
     icon: 'calculator',
     color: 'red',
     modes: ['operation-span']
+  },
+  'culture-fair-intelligence-test': {
+    title: 'Culture Fair Intelligence Test',
+    description: 'Visual puzzles including series completion, classification, matrices, and conditional reasoning.',
+    icon: 'puzzle',
+    color: 'green',
+    modes: ['culture-fair-iq']
   }
 };
 

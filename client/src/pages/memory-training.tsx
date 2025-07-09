@@ -4,6 +4,7 @@ import { MainGameSelection } from "@/components/main-game-selection";
 import { WMSModeSelection } from "@/components/wms-mode-selection";
 import { GameInterface } from "@/components/game-interface";
 import { OperationSpanGame } from "@/components/operation-span-game";
+import { CultureFairGame } from "@/components/culture-fair-game";
 import { InstructionsModal } from "@/components/instructions-modal";
 import { GameMode, MainGame } from "@shared/schema";
 
@@ -16,6 +17,8 @@ export default function MemoryTraining() {
     setCurrentGame(game);
     if (game === 'operation-span-task') {
       setCurrentMode('operation-span');
+    } else if (game === 'culture-fair-intelligence-test') {
+      setCurrentMode('culture-fair-iq');
     }
   };
 
@@ -68,7 +71,13 @@ export default function MemoryTraining() {
           />
         )}
         
-        {currentMode && currentMode !== 'operation-span' && (
+        {currentMode === 'culture-fair-iq' && (
+          <CultureFairGame 
+            onBackToMenu={handleBackToGames}
+          />
+        )}
+        
+        {currentMode && currentMode !== 'operation-span' && currentMode !== 'culture-fair-iq' && (
           <GameInterface 
             mode={currentMode} 
             onBackToMenu={handleBackToModes}

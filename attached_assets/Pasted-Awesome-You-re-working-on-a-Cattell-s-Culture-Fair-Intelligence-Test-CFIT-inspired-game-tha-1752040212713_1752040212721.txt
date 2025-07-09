@@ -1,0 +1,52 @@
+Awesome! You're working on a **Cattell’s Culture Fair Intelligence Test (CFIT)** inspired game — that's such a great idea, especially because it's nonverbal, visual, and conceptually clear for diverse users. If you’re building this on **Replit**, you can use **HTML/CSS/JavaScript** for an interactive web-based version. Here's a prompt to get you started, followed by a breakdown of what to include:
+
+---
+
+### ✅ Replit Prompt:
+
+**"Create a web-based game that simulates the Cattell’s Culture Fair Intelligence Test (CFIT). The game should include 4 types of non-verbal subtests: Series Completion, Classifications, Matrices, and Conditions. Each subtest should display visual puzzles using abstract shapes or patterns. Users should be able to select their answers from multiple choices. Track and display the score at the end, and make it visually engaging and intuitive to use. Use HTML, CSS, and JavaScript (no external frameworks required unless necessary)."**
+
+---
+
+### 🧠 Key Features to Include in the Game:
+
+#### 1. **Home Screen**
+
+* Title: “Culture Fair Intelligence Test”
+* Buttons: “Start Test”, “Instructions”, “View Score”
+
+#### 2. **Instructions Page**
+
+Explain each subtest type simply (like your description above).
+
+#### 3. **Gameplay Flow**
+
+* Each subtest appears one after another.
+* 3–5 questions per subtest (Series Completion, Classifications, Matrices, Conditions).
+* Questions are **visual puzzles** using shapes (SVG or images).
+* Multiple choice options (A, B, C, D).
+
+#### 4. **Score System**
+
+* +1 for each correct answer.
+* Display total at the end with a simulated "IQ-like score" (e.g., scaled out of 160).
+
+#### 5. **Technologies**
+
+* **HTML**: structure (buttons, question layout)
+* **CSS**: visuals (clean, minimal, with visual focus on puzzles)
+* **JavaScript**: game logic, transitions, scoring, randomization
+
+---
+
+### 🔧 Optional Enhancements:
+
+* Timer per question (optional)
+* LocalStorage to save high scores
+* Progress bar
+* Animated transitions
+* Dark mode
+
+---
+
+Would you like me to generate the **starter HTML/JS/CSS code for the first subtest (e.g., Series Completion)** right away? Or do you want a full project scaffold you can directly run in Replit?

@@ -37,12 +37,13 @@ export type GameStats = typeof gameStats.$inferSelect;
 export type InsertGameStats = z.infer<typeof insertGameStatsSchema>;
 
 // Game mode types
-export type GameMode = 'ds-forward' | 'ds-backward' | 'spatial-forward' | 'spatial-backward' | 'operation-span';
+export type GameMode = 'ds-forward' | 'ds-backward' | 'spatial-forward' | 'spatial-backward' | 'operation-span' | 'culture-fair-iq';
 export type GamePhase = 'menu' | 'display' | 'input' | 'feedback';
 export type OperationSpanPhase = 'math' | 'word' | 'recall' | 'feedback';
+export type CultureFairPhase = 'question' | 'feedback' | 'complete';
 
 // Main game categories
-export type MainGame = 'wechsler-memory-scale' | 'operation-span-task';
+export type MainGame = 'wechsler-memory-scale' | 'operation-span-task' | 'culture-fair-intelligence-test';
 
 export interface MainGameConfig {
   title: string;
@@ -84,6 +85,31 @@ export interface OperationSpanState {
     mathCorrect: number;
     mathIncorrect: number;
     wordsCorrect: number;
+    totalTime: number;
+    attempts: number;
+  };
+}
+
+export interface CultureFairQuestion {
+  id: number;
+  type: 'series' | 'classification' | 'matrices' | 'conditions';
+  title: string;
+  description: string;
+  options: string[];
+  correctAnswer: string;
+  difficulty: 1 | 2 | 3 | 4 | 5;
+}
+
+export interface CultureFairState {
+  currentQuestion: number;
+  currentScore: number;
+  totalQuestions: number;
+  gamePhase: CultureFairPhase;
+  selectedAnswer: string | null;
+  timeRemaining: number;
+  stats: {
+    correct: number;
+    incorrect: number;
     totalTime: number;
     attempts: number;
   };
