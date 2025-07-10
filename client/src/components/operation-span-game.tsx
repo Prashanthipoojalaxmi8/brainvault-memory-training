@@ -117,14 +117,11 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
       }
     }));
 
+    // Store math errors but don't show toast during gameplay
     if (!isCorrect) {
-      toast({
-        title: "Math Incorrect",
-        description: `The correct answer was ${currentMathData.answer}`,
-        variant: "destructive",
-      });
+      console.log('DEBUG Math Incorrect - will be shown in final summary');
     } else {
-      console.log('DEBUG Math Correct - no toast shown');
+      console.log('DEBUG Math Correct');
     }
 
     // Generate word and move to word phase
@@ -170,10 +167,16 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
   };
 
   const handleRecallSubmit = () => {
-    const userWords = gameState.userRecallInput
-      .split(',')
-      .map(word => word.trim())
-      .filter(word => word.length > 0);
+    // Parse user input - accept both comma-separated and space-separated words
+    let userWords: string[] = [];
+    const rawInput = gameState.userRecallInput.trim();
+    
+    // Try comma separation first, then space separation
+    if (rawInput.includes(',')) {
+      userWords = rawInput.split(',').map(word => word.trim()).filter(word => word.length > 0);
+    } else {
+      userWords = rawInput.split(/\s+/).filter(word => word.length > 0);
+    }
     
     const correctWords = gameState.rememberedWords;
     
@@ -181,23 +184,11 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
       rawInput: gameState.userRecallInput,
       userWords,
       correctWords,
-      totalPairs: gameState.totalPairs,
-      rememberedWordsLength: gameState.rememberedWords.length
+      totalPairs: gameState.totalPairs
     });
-    
-    // Test validation logic step by step
-    console.log('DEBUG STEP BY STEP TEST:');
-    console.log('1. User input string:', JSON.stringify(gameState.userRecallInput));
-    console.log('2. Split result:', gameState.userRecallInput.split(','));
-    console.log('3. After trim and filter:', userWords);
-    console.log('4. Correct words from state:', correctWords);
-    console.log('5. Expected total pairs:', gameState.totalPairs);
     
     const wordsCorrect = validateWordRecall(userWords, correctWords);
     const isLevelComplete = wordsCorrect === gameState.totalPairs;
-    
-    console.log('6. Validation result:', wordsCorrect);
-    console.log('7. Is level complete:', isLevelComplete);
     
     console.log('DEBUG AFTER VALIDATION:', {
       userWords,
@@ -567,7 +558,7 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
               <div className="text-center mb-6">
                 <h2 className="text-xl font-bold mb-2">Recall All Words</h2>
                 <p className="text-gray-600 mb-2">
-                  Enter all {gameState.totalPairs} words you remember, separated by commas
+                  Enter all {gameState.totalPairs} words you remember
                 </p>
                 <p className="text-sm text-gray-500">
                   Remember the words in the order they appeared
@@ -579,11 +570,11 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
                   value={gameState.userRecallInput}
                   onChange={(e) => setGameState(prev => ({ ...prev, userRecallInput: e.target.value }))}
                   onKeyPress={(e) => handleKeyPress(e, handleRecallSubmit)}
-                  placeholder="Apple, Chair, Tree..."
+                  placeholder="Enter your answer here"
                   className="text-center text-lg max-w-md mx-auto"
                 />
                 <p className="text-xs text-gray-500 mt-2">
-                  Tip: Enter words in the same order they appeared
+                  Tip: Enter words separated by commas or spaces
                 </p>
               </div>
               

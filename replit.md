@@ -89,6 +89,8 @@ The build process creates:
 
 ```
 Changelog:
+- July 09, 2025. Fixed Operation Span Task validation issues: case-insensitive word matching, flexible input parsing (commas or spaces), removed error toasts during gameplay, improved placeholder text
+- July 09, 2025. Added comprehensive mistake tracking and summary display for Operation Span Task
 - July 09, 2025. Removed Culture Fair Intelligence Test as requested by user
 - July 09, 2025. Enhanced Culture Fair Intelligence Test with logical patterns and helpful hints
 - July 09, 2025. Added Culture Fair Intelligence Test with 5 visual puzzle types

@@ -186,59 +186,39 @@ export function validateWordRecall(userWords: string[], correctWords: string[]):
     correctWordsLength: correctWords.length
   });
   
-  // More aggressive cleaning - remove all extra spaces and convert to lowercase
+  // Clean and normalize words - case insensitive, remove extra spaces
   const userCleaned = userWords.map(w => w.trim().toLowerCase()).filter(w => w.length > 0);
   const correctCleaned = correctWords.map(w => w.trim().toLowerCase());
   
   console.log('DEBUG cleaned words:', {
     userCleaned,
-    correctCleaned,
-    userCleanedStringified: JSON.stringify(userCleaned),
-    correctCleanedStringified: JSON.stringify(correctCleaned)
+    correctCleaned
   });
   
   // Count how many words are correct in the right position
   let correctCount = 0;
   const minLength = Math.min(userCleaned.length, correctCleaned.length);
   
-  // Detailed validation logging
+  // Check each word position
   for (let i = 0; i < minLength; i++) {
     const userWord = userCleaned[i];
     const correctWord = correctCleaned[i];
     const match = userWord === correctWord;
-    console.log(`DEBUG word ${i}: "${userWord}" (${userWord.length}) vs "${correctWord}" (${correctWord.length}) = ${match}`);
-    
-    // Check for hidden characters
-    if (!match) {
-      console.log('DEBUG non-match details:', {
-        userCharCodes: Array.from(userWord).map(c => c.charCodeAt(0)),
-        correctCharCodes: Array.from(correctWord).map(c => c.charCodeAt(0)),
-        userChars: Array.from(userWord),
-        correctChars: Array.from(correctWord)
-      });
-    }
+    console.log(`DEBUG word ${i}: "${userWord}" vs "${correctWord}" = ${match}`);
     
     if (match) {
       correctCount++;
     }
   }
   
-  // Check if user provided too many or too few words
-  if (userCleaned.length !== correctCleaned.length) {
-    console.log('DEBUG length mismatch - user provided', userCleaned.length, 'expected', correctCleaned.length);
-  }
-  
   console.log('DEBUG validation result:', {
     correctCount,
-    minLength,
     totalExpected: correctCleaned.length,
-    perfectMatch: correctCount === correctCleaned.length && userCleaned.length === correctCleaned.length
+    userProvided: userCleaned.length
   });
   
-  // For Operation Span Task, we need all words to be correct in order AND the right number of words
-  const isComplete = correctCount === correctCleaned.length && userCleaned.length === correctCleaned.length;
-  console.log('DEBUG final result:', { isComplete, returning: isComplete ? correctCleaned.length : 0 });
-  return isComplete ? correctCleaned.length : 0;
+  // Return the number of correct words (partial credit allowed)
+  return correctCount;
 }
 
 
