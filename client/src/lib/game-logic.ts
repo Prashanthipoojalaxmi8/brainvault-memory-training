@@ -186,12 +186,15 @@ export function validateWordRecall(userWords: string[], correctWords: string[]):
     correctWordsLength: correctWords.length
   });
   
+  // More aggressive cleaning - remove all extra spaces and convert to lowercase
   const userCleaned = userWords.map(w => w.trim().toLowerCase()).filter(w => w.length > 0);
   const correctCleaned = correctWords.map(w => w.trim().toLowerCase());
   
   console.log('DEBUG cleaned words:', {
     userCleaned,
-    correctCleaned
+    correctCleaned,
+    userCleanedStringified: JSON.stringify(userCleaned),
+    correctCleanedStringified: JSON.stringify(correctCleaned)
   });
   
   // Count how many words are correct in the right position
@@ -200,8 +203,21 @@ export function validateWordRecall(userWords: string[], correctWords: string[]):
   
   // Detailed validation logging
   for (let i = 0; i < minLength; i++) {
-    const match = userCleaned[i] === correctCleaned[i];
-    console.log(`DEBUG word ${i}: "${userCleaned[i]}" vs "${correctCleaned[i]}" = ${match}`);
+    const userWord = userCleaned[i];
+    const correctWord = correctCleaned[i];
+    const match = userWord === correctWord;
+    console.log(`DEBUG word ${i}: "${userWord}" (${userWord.length}) vs "${correctWord}" (${correctWord.length}) = ${match}`);
+    
+    // Check for hidden characters
+    if (!match) {
+      console.log('DEBUG non-match details:', {
+        userCharCodes: Array.from(userWord).map(c => c.charCodeAt(0)),
+        correctCharCodes: Array.from(correctWord).map(c => c.charCodeAt(0)),
+        userChars: Array.from(userWord),
+        correctChars: Array.from(correctWord)
+      });
+    }
+    
     if (match) {
       correctCount++;
     }
@@ -221,6 +237,7 @@ export function validateWordRecall(userWords: string[], correctWords: string[]):
   
   // For Operation Span Task, we need all words to be correct in order AND the right number of words
   const isComplete = correctCount === correctCleaned.length && userCleaned.length === correctCleaned.length;
+  console.log('DEBUG final result:', { isComplete, returning: isComplete ? correctCleaned.length : 0 });
   return isComplete ? correctCleaned.length : 0;
 }
 

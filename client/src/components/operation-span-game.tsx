@@ -176,10 +176,30 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
       .filter(word => word.length > 0);
     
     const correctWords = gameState.rememberedWords;
+    
+    console.log('DEBUG BEFORE VALIDATION:', {
+      rawInput: gameState.userRecallInput,
+      userWords,
+      correctWords,
+      totalPairs: gameState.totalPairs,
+      rememberedWordsLength: gameState.rememberedWords.length
+    });
+    
+    // Test validation logic step by step
+    console.log('DEBUG STEP BY STEP TEST:');
+    console.log('1. User input string:', JSON.stringify(gameState.userRecallInput));
+    console.log('2. Split result:', gameState.userRecallInput.split(','));
+    console.log('3. After trim and filter:', userWords);
+    console.log('4. Correct words from state:', correctWords);
+    console.log('5. Expected total pairs:', gameState.totalPairs);
+    
     const wordsCorrect = validateWordRecall(userWords, correctWords);
     const isLevelComplete = wordsCorrect === gameState.totalPairs;
     
-    console.log('DEBUG Recall:', {
+    console.log('6. Validation result:', wordsCorrect);
+    console.log('7. Is level complete:', isLevelComplete);
+    
+    console.log('DEBUG AFTER VALIDATION:', {
       userWords,
       correctWords,
       wordsCorrect,
