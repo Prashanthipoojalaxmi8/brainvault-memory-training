@@ -570,7 +570,7 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
                   value={gameState.userRecallInput}
                   onChange={(e) => setGameState(prev => ({ ...prev, userRecallInput: e.target.value }))}
                   onKeyPress={(e) => handleKeyPress(e, handleRecallSubmit)}
-                  placeholder="Enter your answer here"
+                  placeholder="word1,word2,word3......"
                   className="text-center text-lg max-w-md mx-auto"
                 />
                 <p className="text-xs text-gray-500 mt-2">
