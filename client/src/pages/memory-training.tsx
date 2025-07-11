@@ -4,6 +4,7 @@ import { MainGameSelection } from "@/components/main-game-selection";
 import { WMSModeSelection } from "@/components/wms-mode-selection";
 import { GameInterface } from "@/components/game-interface";
 import { OperationSpanGame } from "@/components/operation-span-game";
+import { WisconsinCardSortingTest } from "@/components/wisconsin-card-sorting-test";
 
 import { InstructionsModal } from "@/components/instructions-modal";
 import { GameMode, MainGame } from "@shared/schema";
@@ -17,6 +18,8 @@ export default function MemoryTraining() {
     setCurrentGame(game);
     if (game === 'operation-span-task') {
       setCurrentMode('operation-span');
+    } else if (game === 'wisconsin-card-sorting-test') {
+      setCurrentMode('wcst');
     }
   };
 
@@ -69,7 +72,13 @@ export default function MemoryTraining() {
           />
         )}
         
-        {currentMode && currentMode !== 'operation-span' && (
+        {currentMode === 'wcst' && (
+          <WisconsinCardSortingTest 
+            onBackToMenu={handleBackToGames}
+          />
+        )}
+        
+        {currentMode && currentMode !== 'operation-span' && currentMode !== 'wcst' && (
           <GameInterface 
             mode={currentMode} 
             onBackToMenu={handleBackToModes}

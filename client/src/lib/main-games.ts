@@ -15,7 +15,13 @@ export const MAIN_GAMES: Record<MainGame, MainGameConfig> = {
     color: 'red',
     modes: ['operation-span']
   },
-
+  'wisconsin-card-sorting-test': {
+    title: 'Wisconsin Card Sorting Test',
+    description: 'Test your cognitive flexibility by matching cards according to hidden rules that change without warning.',
+    icon: 'layers',
+    color: 'purple',
+    modes: ['wcst']
+  },
 };
 
 export const WMS_MODES = {

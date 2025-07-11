@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Brain, Calculator, HelpCircle, RotateCcw, Puzzle } from "lucide-react";
+import { Brain, Calculator, HelpCircle, RotateCcw, Puzzle, Layers } from "lucide-react";
 import { MainGame } from "@shared/schema";
 import { MAIN_GAMES } from "@/lib/main-games";
 import { getStoredProgress, resetProgress } from "@/lib/storage";
@@ -14,12 +14,14 @@ const iconMap = {
   'brain': Brain,
   'calculator': Calculator,
   'puzzle': Puzzle,
+  'layers': Layers,
 };
 
 const backgroundColorMap = {
   blue: 'bg-gradient-to-br from-blue-400 to-blue-600',
   red: 'bg-gradient-to-br from-red-400 to-red-600',
   green: 'bg-gradient-to-br from-green-400 to-green-600',
+  purple: 'bg-gradient-to-br from-purple-400 to-purple-600',
 };
 
 export function MainGameSelection({ onSelectGame, onShowInstructions }: MainGameSelectionProps) {
@@ -94,9 +96,9 @@ export function MainGameSelection({ onSelectGame, onShowInstructions }: MainGame
                   </div>
                 </div>
                 
-                {/* NEW badge for Operation Span */}
-                {game === 'operation-span-task' && (
-                  <div className="absolute top-4 right-4 bg-white text-red-500 text-xs px-2 py-1 rounded-full font-bold">
+                {/* NEW badge for newest games */}
+                {game === 'wisconsin-card-sorting-test' && (
+                  <div className="absolute top-4 right-4 bg-white text-purple-500 text-xs px-2 py-1 rounded-full font-bold">
                     NEW
                   </div>
                 )}

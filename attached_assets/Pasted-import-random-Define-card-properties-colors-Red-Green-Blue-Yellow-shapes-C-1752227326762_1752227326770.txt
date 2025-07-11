@@ -1,0 +1,86 @@
+import random
+
+# Define card properties
+colors = ['Red', 'Green', 'Blue', 'Yellow']
+shapes = ['Circle', 'Triangle', 'Star', 'Square']
+numbers = [1, 2, 3, 4]
+
+# Create deck
+def create_deck():
+    deck = []
+    for color in colors:
+        for shape in shapes:
+            for number in numbers:
+                deck.append({'color': color, 'shape': shape, 'number': number})
+    random.shuffle(deck)
+    return deck
+
+# Choose a sorting rule
+def choose_rule():
+    return random.choice(['color', 'shape', 'number'])
+
+# Show cards to choose from
+def show_reference_cards():
+    return [
+        {'color': 'Red', 'shape': 'Circle', 'number': 1},
+        {'color': 'Green', 'shape': 'Star', 'number': 2},
+        {'color': 'Blue', 'shape': 'Triangle', 'number': 3},
+        {'color': 'Yellow', 'shape': 'Square', 'number': 4}
+    ]
+
+# Compare based on current rule
+def get_feedback(card, chosen_card, rule):
+    return card[rule] == chosen_card[rule]
+
+def play_wcst():
+    print("🧠 Welcome to the Wisconsin Card Sorting Test (WCST)!\n")
+    deck = create_deck()
+    reference_cards = show_reference_cards()
+    rule = choose_rule()
+    correct_count = 0
+    total_attempts = 0
+    switch_after = 6  # Change rule after this many correct answers
+    perseveration_errors = 0
+
+    while total_attempts < 30:
+        card = deck.pop()
+        print(f"\n🔹 Match this card: Color={card['color']}, Shape={card['shape']}, Number={card['number']}")
+        print("Reference cards:")
+        for i, ref in enumerate(reference_cards):
+            print(f"{i+1}. Color={ref['color']}, Shape={ref['shape']}, Number={ref['number']}")
+
+        try:
+            choice = int(input("Choose a reference card to match (1-4): ")) - 1
+            if choice not in range(4):
+                raise ValueError
+        except ValueError:
+            print("❌ Invalid input. Try again.")
+            continue
+
+        chosen_card = reference_cards[choice]
+        is_correct = get_feedback(card, chosen_card, rule)
+
+        if is_correct:
+            print("✅ Correct!")
+            correct_count += 1
+        else:
+            print("❌ Incorrect.")
+            if correct_count >= switch_after:
+                perseveration_errors += 1  # Still using old rule?
+        
+        total_attempts += 1
+
+        # Rule switch logic
+        if correct_count >= switch_after:
+            old_rule = rule
+            while rule == old_rule:
+                rule = choose_rule()
+            print("⚠️ Rule has changed! But you won't be told how. Adapt!")
+            correct_count = 0
+
+    print("\n🏁 Test Complete!")
+    print(f"Total Attempts: {total_attempts}")
+    print(f"Perseveration Errors: {perseveration_errors}")
+    print("Thanks for playing!")
+
+play_wcst()

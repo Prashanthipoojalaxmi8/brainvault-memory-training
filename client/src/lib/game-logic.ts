@@ -1,4 +1,4 @@
-import { GameMode, GameState, ModeConfig } from "@shared/schema";
+import { GameMode, GameState, ModeConfig, WCSTCard } from "@shared/schema";
 
 export const MODES: Record<GameMode, ModeConfig> = {
   'ds-forward': {
@@ -40,6 +40,14 @@ export const MODES: Record<GameMode, ModeConfig> = {
     reverse: false,
     icon: 'calculator',
     color: 'red'
+  },
+  'wcst': {
+    title: 'Wisconsin Card Sorting Test',
+    description: 'Test your cognitive flexibility by matching cards according to hidden rules.',
+    type: 'mixed',
+    reverse: false,
+    icon: 'layers',
+    color: 'purple'
   }
 };
 
@@ -176,6 +184,58 @@ export function validateMathAnswer(userAnswer: string, correctAnswer: number): b
   });
   
   return isValid;
+}
+
+// Wisconsin Card Sorting Test Logic
+export function createWCSTDeck(): WCSTCard[] {
+  const colors: ('Red' | 'Green' | 'Blue' | 'Yellow')[] = ['Red', 'Green', 'Blue', 'Yellow'];
+  const shapes: ('Circle' | 'Triangle' | 'Star' | 'Square')[] = ['Circle', 'Triangle', 'Star', 'Square'];
+  const numbers: (1 | 2 | 3 | 4)[] = [1, 2, 3, 4];
+  
+  const deck: WCSTCard[] = [];
+  for (const color of colors) {
+    for (const shape of shapes) {
+      for (const number of numbers) {
+        deck.push({ color, shape, number });
+      }
+    }
+  }
+  
+  // Shuffle deck
+  for (let i = deck.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [deck[i], deck[j]] = [deck[j], deck[i]];
+  }
+  
+  return deck;
+}
+
+export function createWCSTReferenceCards(): WCSTCard[] {
+  return [
+    { color: 'Red', shape: 'Circle', number: 1 },
+    { color: 'Green', shape: 'Star', number: 2 },
+    { color: 'Blue', shape: 'Triangle', number: 3 },
+    { color: 'Yellow', shape: 'Square', number: 4 }
+  ];
+}
+
+export function chooseWCSTRule(): 'color' | 'shape' | 'number' {
+  const rules: ('color' | 'shape' | 'number')[] = ['color', 'shape', 'number'];
+  return rules[Math.floor(Math.random() * rules.length)];
+}
+
+export function validateWCSTMatch(currentCard: WCSTCard, chosenCard: WCSTCard, rule: 'color' | 'shape' | 'number'): boolean {
+  return currentCard[rule] === chosenCard[rule];
+}
+
+export function shouldSwitchWCSTRule(consecutiveCorrect: number, switchThreshold: number = 6): boolean {
+  return consecutiveCorrect >= switchThreshold;
+}
+
+export function calculateWCSTScore(totalAttempts: number, totalCorrect: number, perseverationErrors: number): number {
+  const accuracy = totalCorrect / totalAttempts;
+  const errorPenalty = perseverationErrors * 0.1;
+  return Math.max(0, Math.round((accuracy - errorPenalty) * 100));
 }
 
 export function validateWordRecall(userWords: string[], correctWords: string[]): number {

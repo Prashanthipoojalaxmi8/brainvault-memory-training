@@ -37,11 +37,12 @@ export type GameStats = typeof gameStats.$inferSelect;
 export type InsertGameStats = z.infer<typeof insertGameStatsSchema>;
 
 // Game mode types
-export type GameMode = 'ds-forward' | 'ds-backward' | 'spatial-forward' | 'spatial-backward' | 'operation-span';
+export type GameMode = 'ds-forward' | 'ds-backward' | 'spatial-forward' | 'spatial-backward' | 'operation-span' | 'wcst';
 export type GamePhase = 'menu' | 'display' | 'input' | 'feedback';
 export type OperationSpanPhase = 'math' | 'word' | 'recall' | 'feedback';
+export type WCSTPhase = 'display' | 'feedback' | 'complete';
 // Main game categories
-export type MainGame = 'wechsler-memory-scale' | 'operation-span-task';
+export type MainGame = 'wechsler-memory-scale' | 'operation-span-task' | 'wisconsin-card-sorting-test';
 
 export interface MainGameConfig {
   title: string;
@@ -101,4 +102,31 @@ export interface ModeConfig {
   reverse: boolean;
   icon: string;
   color: string;
+}
+
+// Wisconsin Card Sorting Test specific types
+export interface WCSTCard {
+  color: 'Red' | 'Green' | 'Blue' | 'Yellow';
+  shape: 'Circle' | 'Triangle' | 'Star' | 'Square';
+  number: 1 | 2 | 3 | 4;
+}
+
+export interface WCSTState {
+  currentCard: WCSTCard;
+  referenceCards: WCSTCard[];
+  currentRule: 'color' | 'shape' | 'number';
+  gamePhase: WCSTPhase;
+  attempts: number;
+  correctCount: number;
+  consecutiveCorrect: number;
+  ruleSwitches: number;
+  perseverationErrors: number;
+  stats: {
+    totalAttempts: number;
+    totalCorrect: number;
+    totalIncorrect: number;
+    averageResponseTime: number;
+    ruleBreaks: number;
+  };
+  isComplete: boolean;
 }
