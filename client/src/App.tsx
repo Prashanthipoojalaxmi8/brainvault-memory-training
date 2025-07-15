@@ -26,6 +26,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
+        <div className="animated-bg"></div>
         <Toaster />
         <Router />
       </TooltipProvider>
