@@ -382,35 +382,7 @@ export function WisconsinCardSortingTest({ onBackToMenu }: WisconsinCardSortingT
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <div className="text-center">
-          <div className="text-2xl font-bold text-blue-600">{gameState.attempts}</div>
-          <div className="text-sm text-gray-600">Attempts</div>
-        </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold text-green-600">{gameState.stats.totalCorrect}</div>
-          <div className="text-sm text-gray-600">Correct</div>
-        </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold text-red-600">{gameState.stats.totalIncorrect}</div>
-          <div className="text-sm text-gray-600">Incorrect</div>
-        </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold text-purple-600">{gameState.ruleSwitches}</div>
-          <div className="text-sm text-gray-600">Rule Switches</div>
-        </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold text-orange-600">{gameState.perseverationErrors}</div>
-          <div className="text-sm text-gray-600">Perseveration Errors</div>
-        </div>
-      </div>
 
-      <div className="w-full bg-gray-200 rounded-full h-2">
-        <div 
-          className="bg-purple-600 h-2 rounded-full transition-all duration-300"
-          style={{ width: `${(gameState.attempts / 30) * 100}%` }}
-        />
-      </div>
 
       {showRuleChange && (
         <Card className="border-4 border-orange-500 bg-gradient-to-r from-orange-100 to-yellow-100 shadow-2xl animate-pulse">
