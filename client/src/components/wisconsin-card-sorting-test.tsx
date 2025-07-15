@@ -16,6 +16,7 @@ import {
   shouldSwitchWCSTRule,
   calculateWCSTScore 
 } from '@/lib/game-logic';
+import { updateGameResult } from '@/lib/storage';
 
 interface WisconsinCardSortingTestProps {
   onBackToMenu: () => void;
@@ -23,6 +24,7 @@ interface WisconsinCardSortingTestProps {
 
 export function WisconsinCardSortingTest({ onBackToMenu }: WisconsinCardSortingTestProps) {
   const [deck, setDeck] = useState<WCSTCard[]>([]);
+  const [showInstructions, setShowInstructions] = useState(true);
   const [gameState, setGameState] = useState<WCSTState>({
     currentCard: { color: 'Red', shape: 'Circle', number: 1 },
     referenceCards: [],
@@ -57,13 +59,26 @@ export function WisconsinCardSortingTest({ onBackToMenu }: WisconsinCardSortingT
     const initialRule = chooseWCSTRule();
     
     setDeck(newDeck);
-    setGameState(prev => ({
-      ...prev,
+    setShowInstructions(true);
+    setGameState({
       currentCard: newDeck[0],
       referenceCards,
       currentRule: initialRule,
       gamePhase: 'display',
-    }));
+      attempts: 0,
+      correctCount: 0,
+      consecutiveCorrect: 0,
+      ruleSwitches: 0,
+      perseverationErrors: 0,
+      stats: {
+        totalAttempts: 0,
+        totalCorrect: 0,
+        totalIncorrect: 0,
+        averageResponseTime: 0,
+        ruleBreaks: 0,
+      },
+      isComplete: false,
+    });
     setStartTime(Date.now());
   };
 
@@ -146,6 +161,15 @@ export function WisconsinCardSortingTest({ onBackToMenu }: WisconsinCardSortingT
 
   const nextCard = () => {
     if (gameState.attempts >= 30) {
+      // Save final results
+      const finalScore = calculateWCSTScore(
+        gameState.stats.totalAttempts,
+        gameState.stats.totalCorrect,
+        gameState.perseverationErrors
+      );
+      
+      updateGameResult('wcst', 1, finalScore, gameState.stats.totalCorrect, gameState.stats.totalIncorrect, gameState.stats.averageResponseTime);
+      
       setGameState(prev => ({
         ...prev,
         gamePhase: 'complete',
@@ -163,6 +187,15 @@ export function WisconsinCardSortingTest({ onBackToMenu }: WisconsinCardSortingT
       }));
       setStartTime(Date.now());
     } else {
+      // Save final results
+      const finalScore = calculateWCSTScore(
+        gameState.stats.totalAttempts,
+        gameState.stats.totalCorrect,
+        gameState.perseverationErrors
+      );
+      
+      updateGameResult('wcst', 1, finalScore, gameState.stats.totalCorrect, gameState.stats.totalIncorrect, gameState.stats.averageResponseTime);
+      
       setGameState(prev => ({
         ...prev,
         gamePhase: 'complete',
@@ -220,6 +253,62 @@ export function WisconsinCardSortingTest({ onBackToMenu }: WisconsinCardSortingT
     gameState.stats.totalCorrect,
     gameState.perseverationErrors
   );
+
+  // Instructions screen
+  if (showInstructions) {
+    return (
+      <div className="max-w-4xl mx-auto p-6 space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Layers className="w-6 h-6 text-purple-600" />
+            <h1 className="text-2xl font-bold">Wisconsin Card Sorting Test</h1>
+          </div>
+          <Button onClick={onBackToMenu} variant="outline">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Menu
+          </Button>
+        </div>
+
+        <Card>
+          <CardContent className="p-8">
+            <div className="text-center space-y-6">
+              <div className="text-purple-600 text-6xl mb-4">🧠</div>
+              <h2 className="text-3xl font-bold text-purple-600">How to Play</h2>
+              
+              <div className="space-y-4 text-left max-w-2xl mx-auto">
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <h3 className="font-bold text-lg mb-2">🎯 Goal</h3>
+                  <p>Match cards according to a hidden rule. The rule can be based on color, shape, or number.</p>
+                </div>
+                
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <h3 className="font-bold text-lg mb-2">🔄 Rule Changes</h3>
+                  <p>After 6 consecutive correct matches, the rule will change without warning. You must adapt!</p>
+                </div>
+                
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <h3 className="font-bold text-lg mb-2">📊 Scoring</h3>
+                  <p>You'll complete 30 attempts. Higher accuracy and fewer perseveration errors = better score.</p>
+                </div>
+                
+                <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
+                  <h3 className="font-bold text-lg mb-2 text-orange-600">⚠️ Important</h3>
+                  <p className="text-orange-600">The sorting rule is hidden - you must discover it through trial and error!</p>
+                </div>
+              </div>
+              
+              <Button 
+                onClick={() => setShowInstructions(false)} 
+                className="bg-purple-600 hover:bg-purple-700 text-white text-lg px-8 py-3"
+              >
+                Start Test
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   if (gameState.gamePhase === 'complete') {
     return (
@@ -324,11 +413,11 @@ export function WisconsinCardSortingTest({ onBackToMenu }: WisconsinCardSortingT
       </div>
 
       {showRuleChange && (
-        <Card className="border-2 border-orange-500 bg-orange-100 shadow-lg">
-          <CardContent className="p-6 text-center">
-            <div className="text-orange-600 text-4xl mb-2">⚠️</div>
-            <h3 className="text-2xl font-bold text-orange-600 mb-2">Rule has Changed!</h3>
-            <p className="text-lg text-orange-700">The sorting rule has switched. You must figure out the new rule through trial and error.</p>
+        <Card className="border-4 border-orange-500 bg-gradient-to-r from-orange-100 to-yellow-100 shadow-2xl animate-pulse">
+          <CardContent className="p-8 text-center">
+            <div className="text-orange-600 text-6xl mb-4 animate-bounce">⚠️</div>
+            <h3 className="text-3xl font-bold text-orange-600 mb-4 uppercase tracking-wide">RULE HAS CHANGED!</h3>
+            <p className="text-xl text-orange-700 font-semibold">The sorting rule has switched. You must figure out the new rule through trial and error.</p>
           </CardContent>
         </Card>
       )}
@@ -366,11 +455,7 @@ export function WisconsinCardSortingTest({ onBackToMenu }: WisconsinCardSortingT
               </div>
             </div>
 
-            <div className="text-center text-sm text-gray-600">
-              <p>Match the card above to one of the reference cards.</p>
-              <p>The sorting rule is hidden - you must discover it through trial and error.</p>
-              <p>Rules can be based on color, shape, or number, and may change without warning!</p>
-            </div>
+
           </div>
         </CardContent>
       </Card>
