@@ -242,7 +242,7 @@ export function WisconsinCardSortingTest({ onBackToMenu }: WisconsinCardSortingT
               <h2 className="text-3xl font-bold text-green-600">Test Complete!</h2>
               <p className="text-xl text-gray-600">Final Score: {finalScore}</p>
               
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-6">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-blue-600">{gameState.stats.totalAttempts}</div>
                   <div className="text-sm text-gray-600">Total Attempts</div>
@@ -250,6 +250,10 @@ export function WisconsinCardSortingTest({ onBackToMenu }: WisconsinCardSortingT
                 <div className="text-center">
                   <div className="text-2xl font-bold text-green-600">{gameState.stats.totalCorrect}</div>
                   <div className="text-sm text-gray-600">Correct</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-red-600">{gameState.stats.totalIncorrect}</div>
+                  <div className="text-sm text-gray-600">Incorrect</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-purple-600">{gameState.ruleSwitches}</div>
@@ -289,14 +293,18 @@ export function WisconsinCardSortingTest({ onBackToMenu }: WisconsinCardSortingT
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <div className="text-center">
           <div className="text-2xl font-bold text-blue-600">{gameState.attempts}</div>
           <div className="text-sm text-gray-600">Attempts</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-green-600">{gameState.correctCount}</div>
+          <div className="text-2xl font-bold text-green-600">{gameState.stats.totalCorrect}</div>
           <div className="text-sm text-gray-600">Correct</div>
+        </div>
+        <div className="text-center">
+          <div className="text-2xl font-bold text-red-600">{gameState.stats.totalIncorrect}</div>
+          <div className="text-sm text-gray-600">Incorrect</div>
         </div>
         <div className="text-center">
           <div className="text-2xl font-bold text-purple-600">{gameState.ruleSwitches}</div>
@@ -316,10 +324,11 @@ export function WisconsinCardSortingTest({ onBackToMenu }: WisconsinCardSortingT
       </div>
 
       {showRuleChange && (
-        <Card className="border-orange-500 bg-orange-50">
-          <CardContent className="p-4 text-center">
-            <h3 className="text-lg font-bold text-orange-600">⚠️ Rule has Changed!</h3>
-            <p className="text-orange-600">The sorting rule has switched. You must figure out the new rule.</p>
+        <Card className="border-2 border-orange-500 bg-orange-100 shadow-lg">
+          <CardContent className="p-6 text-center">
+            <div className="text-orange-600 text-4xl mb-2">⚠️</div>
+            <h3 className="text-2xl font-bold text-orange-600 mb-2">Rule has Changed!</h3>
+            <p className="text-lg text-orange-700">The sorting rule has switched. You must figure out the new rule through trial and error.</p>
           </CardContent>
         </Card>
       )}
