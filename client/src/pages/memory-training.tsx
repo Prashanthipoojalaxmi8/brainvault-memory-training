@@ -28,6 +28,7 @@ export default function MemoryTraining() {
   };
 
   const handleBackToGames = () => {
+    console.log('Navigating back to games - clearing current game and mode');
     setCurrentGame(null);
     setCurrentMode(null);
   };

@@ -60,6 +60,8 @@ export function WisconsinCardSortingTest({ onBackToMenu }: WisconsinCardSortingT
     
     setDeck(newDeck);
     setShowInstructions(true);
+    setFeedback(''); // Clear any existing feedback
+    setShowRuleChange(false); // Clear rule change notification
     setGameState({
       currentCard: newDeck[0],
       referenceCards,
@@ -174,6 +176,9 @@ export function WisconsinCardSortingTest({ onBackToMenu }: WisconsinCardSortingT
   };
 
   const nextCard = () => {
+    // Clear feedback when moving to next card
+    setFeedback('');
+    
     if (gameState.attempts >= 30) {
       // Save final results
       const finalScore = calculateWCSTScore(
