@@ -88,6 +88,14 @@ export function WisconsinCardSortingTest({ onBackToMenu }: WisconsinCardSortingT
     const selectedCard = gameState.referenceCards[selectedIndex];
     const isCorrect = validateWCSTMatch(gameState.currentCard, selectedCard, gameState.currentRule);
     
+    console.log('WCST Match Debug:', {
+      currentCard: gameState.currentCard,
+      selectedCard,
+      currentRule: gameState.currentRule,
+      isCorrect,
+      feedback: isCorrect ? 'Correct!' : 'Incorrect'
+    });
+    
     const responseTime = Date.now() - startTime;
     
     setGameState(prev => {
