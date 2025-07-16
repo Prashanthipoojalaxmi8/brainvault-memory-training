@@ -117,24 +117,38 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
       }
     }));
 
-    // Store math errors but don't show toast during gameplay
-    if (!isCorrect) {
-      console.log('DEBUG Math Incorrect - will be shown in final summary');
+    // Show immediate feedback for math answer
+    if (isCorrect) {
+      setTransitionData({
+        title: "Correct!",
+        description: "Well done! Now remember this word:",
+        type: 'success'
+      });
     } else {
-      console.log('DEBUG Math Correct');
+      setTransitionData({
+        title: "Incorrect",
+        description: `Wrong answer. The correct answer was ${currentMathData.answer}. Now remember this word:`,
+        type: 'error'
+      });
     }
-
-    // Generate word and move to word phase
+    
+    setShowTransition(true);
+    
+    // Generate word and move to word phase after showing feedback
     const word = getRandomWord();
     setCurrentWordData(word);
-    setGameState(prev => ({
-      ...prev,
-      currentWord: word,
-      gamePhase: 'word'
-    }));
     
-    // Show word flash animation
-    setShowWordFlash(true);
+    setTimeout(() => {
+      setShowTransition(false);
+      setGameState(prev => ({
+        ...prev,
+        currentWord: word,
+        gamePhase: 'word'
+      }));
+      
+      // Show word flash animation
+      setShowWordFlash(true);
+    }, 1500); // Show feedback for 1.5 seconds
   };
 
   const handleWordRemember = () => {
