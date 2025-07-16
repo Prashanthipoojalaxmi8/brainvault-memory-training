@@ -152,15 +152,15 @@ export function WisconsinCardSortingTest({ onBackToMenu }: WisconsinCardSortingT
       },
     }));
 
-    // Only show rule change notification if there are still attempts left
-    if (gameState.attempts < 30) {
+    // Only show rule change notification if there are still attempts left after this one
+    if (gameState.attempts < 29) {
       setShowRuleChange(true);
       setTimeout(() => {
         setShowRuleChange(false);
         nextCard();
       }, 2000);
     } else {
-      // If no attempts left, just proceed to next card (which will end the game)
+      // If this is the last attempt, don't show rule change notification
       nextCard();
     }
   };
