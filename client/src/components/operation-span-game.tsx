@@ -59,6 +59,11 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
     }
   });
 
+  // Store operation-word pairs for the recall phase
+  const [operationWordPairs, setOperationWordPairs] = useState<{operation: string, word: string, answer: number}[]>([]);
+  const [shuffledRecallOperations, setShuffledRecallOperations] = useState<{operation: string, word: string, answer: number}[]>([]);
+  const [currentRecallIndex, setCurrentRecallIndex] = useState(0);
+
   const [currentMathData, setCurrentMathData] = useState<{question: string, answer: number} | null>(null);
   const [currentWordData, setCurrentWordData] = useState<string>('');
   const [isInitialized, setIsInitialized] = useState(false);
@@ -134,9 +139,19 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
     
     setShowTransition(true);
     
-    // Generate word and move to word phase after showing feedback
+    // Generate word and store the operation-word pair
     const word = getRandomWord();
     setCurrentWordData(word);
+    
+    // Store the operation-word pair
+    setOperationWordPairs(prev => [
+      ...prev,
+      {
+        operation: currentMathData.question,
+        word: word,
+        answer: currentMathData.answer
+      }
+    ]);
     
     setTimeout(() => {
       setShowTransition(false);
@@ -156,6 +171,11 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
     
     // Check if we've collected enough words
     if (newRememberedWords.length >= gameState.totalPairs) {
+      // Shuffle the operations for recall phase to make it more challenging
+      const shuffled = [...operationWordPairs].sort(() => Math.random() - 0.5);
+      setShuffledRecallOperations(shuffled);
+      setCurrentRecallIndex(0);
+      
       // Move to recall phase
       setGameState(prev => ({
         ...prev,
@@ -181,156 +201,141 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
   };
 
   const handleRecallSubmit = () => {
-    // Parse user input - accept both comma-separated and space-separated words
-    let userWords: string[] = [];
-    const rawInput = gameState.userRecallInput.trim();
+    const currentOperation = shuffledRecallOperations[currentRecallIndex];
+    const userAnswer = gameState.userRecallInput.trim().toLowerCase();
+    const correctAnswer = currentOperation.word.toLowerCase();
+    const isCorrect = userAnswer === correctAnswer;
     
-    // Try comma separation first, then space separation
-    if (rawInput.includes(',')) {
-      userWords = rawInput.split(',').map(word => word.trim()).filter(word => word.length > 0);
-    } else {
-      userWords = rawInput.split(/\s+/).filter(word => word.length > 0);
-    }
-    
-    const correctWords = gameState.rememberedWords;
-    
-    console.log('DEBUG BEFORE VALIDATION:', {
-      rawInput: gameState.userRecallInput,
-      userWords,
-      correctWords,
-      totalPairs: gameState.totalPairs
+    console.log('DEBUG Single Operation Recall:', {
+      operation: currentOperation.operation,
+      userAnswer,
+      correctAnswer: currentOperation.word,
+      isCorrect
     });
     
-    const wordsCorrect = validateWordRecall(userWords, correctWords);
-    const isLevelComplete = wordsCorrect === gameState.totalPairs;
-    
-    console.log('DEBUG AFTER VALIDATION:', {
-      userWords,
-      correctWords,
-      wordsCorrect,
-      totalPairs: gameState.totalPairs,
-      isLevelComplete
-    });
-    
-    // Update stats and track mistakes
+    // Update stats
     setGameState(prev => ({
       ...prev,
       stats: {
         ...prev.stats,
-        wordsCorrect: prev.stats.wordsCorrect + wordsCorrect,
+        wordsCorrect: prev.stats.wordsCorrect + (isCorrect ? 1 : 0),
         attempts: prev.stats.attempts + 1
       },
       mistakes: {
         ...prev.mistakes,
-        wordErrors: isLevelComplete ? prev.mistakes.wordErrors : [
+        wordErrors: isCorrect ? prev.mistakes.wordErrors : [
           ...prev.mistakes.wordErrors,
           {
             level: prev.currentLevel,
-            userWords: userWords,
-            correctWords: correctWords,
-            correctCount: wordsCorrect
+            userWords: [userAnswer],
+            correctWords: [currentOperation.word],
+            correctCount: 0,
+            operation: currentOperation.operation
           }
         ]
       }
     }));
 
-    if (isLevelComplete) {
-      const newLevel = gameState.currentLevel + 1;
-      const newScore = gameState.currentScore + (wordsCorrect * 10);
-      setPreviousScore(gameState.currentScore);
+    // Check if this was the last operation
+    if (currentRecallIndex + 1 >= shuffledRecallOperations.length) {
+      // Calculate total correct answers for this level
+      const totalCorrect = gameState.stats.wordsCorrect + (isCorrect ? 1 : 0);
+      const isLevelComplete = totalCorrect === gameState.totalPairs;
       
-      console.log('DEBUG Level Complete:', { newLevel, newScore, wordsCorrect });
-      
-      // Show success transition
-      setTransitionData({
-        title: "Level Complete!",
-        description: `You remembered all ${gameState.totalPairs} words correctly!`,
-        type: 'success'
-      });
-      setShowTransition(true);
-      
-      // Use longer delay to show success message
-      setTimeout(() => {
-        setShowTransition(false);
+      if (isLevelComplete) {
+        const newLevel = gameState.currentLevel + 1;
+        const newScore = gameState.currentScore + (totalCorrect * 10);
+        setPreviousScore(gameState.currentScore);
         
-        if (newLevel <= 3) {
-          // Move to next level
-          const nextLevelPairs = getTotalPairs(newLevel);
-          const mathData = generateMathQuestion(newLevel);
-          setCurrentMathData(mathData);
+        setTransitionData({
+          title: "Level Complete!",
+          description: `Perfect! You matched all ${gameState.totalPairs} operations with their words!`,
+          type: 'success'
+        });
+        setShowTransition(true);
+        
+        setTimeout(() => {
+          setShowTransition(false);
           
-          setGameState(prev => ({
-            ...prev,
-            currentLevel: newLevel,
-            currentScore: newScore,
-            totalPairs: nextLevelPairs,
-            currentPair: 1,
-            rememberedWords: [],
-            currentMathQuestion: mathData.question,
-            currentMathAnswer: mathData.answer,
-            userMathInput: '',
-            userRecallInput: '',
-            gamePhase: 'math'
-          }));
-        } else {
-          // Game complete
-          console.log('DEBUG Game Complete - updating result:', {
-            mode: 'operation-span',
-            level: newLevel,
-            score: newScore,
-            mathCorrect: gameState.stats.mathCorrect,
-            mathIncorrect: gameState.stats.mathIncorrect,
-            wordsCorrect: gameState.stats.wordsCorrect
-          });
+          if (newLevel <= 3) {
+            // Reset for next level
+            setOperationWordPairs([]);
+            setShuffledRecallOperations([]);
+            setCurrentRecallIndex(0);
+            
+            const nextLevelPairs = getTotalPairs(newLevel);
+            const mathData = generateMathQuestion(newLevel);
+            setCurrentMathData(mathData);
+            
+            setGameState(prev => ({
+              ...prev,
+              currentLevel: newLevel,
+              currentScore: newScore,
+              totalPairs: nextLevelPairs,
+              currentPair: 1,
+              rememberedWords: [],
+              currentMathQuestion: mathData.question,
+              currentMathAnswer: mathData.answer,
+              userMathInput: '',
+              userRecallInput: '',
+              gamePhase: 'math',
+              stats: {
+                mathCorrect: 0,
+                mathIncorrect: 0,
+                wordsCorrect: 0,
+                totalTime: 0,
+                attempts: 0
+              }
+            }));
+          } else {
+            // Game complete
+            updateGameResult(
+              'operation-span', 
+              newLevel, 
+              newScore, 
+              totalCorrect, 
+              gameState.stats.mathIncorrect, 
+              gameState.stats.totalTime
+            );
+            setGameState(prev => ({
+              ...prev,
+              currentScore: newScore,
+              gamePhase: 'feedback'
+            }));
+          }
+        }, 3000);
+      } else {
+        // Level failed
+        setTransitionData({
+          title: "Level Failed",
+          description: `You got ${totalCorrect} out of ${gameState.totalPairs} operations correct. Try again!`,
+          type: 'error'
+        });
+        setShowTransition(true);
+        
+        setTimeout(() => {
+          setShowTransition(false);
           updateGameResult(
             'operation-span', 
-            newLevel, 
-            newScore, 
-            gameState.stats.wordsCorrect, 
+            gameState.currentLevel, 
+            gameState.currentScore, 
+            totalCorrect, 
             gameState.stats.mathIncorrect, 
             gameState.stats.totalTime
           );
           setGameState(prev => ({
             ...prev,
-            currentScore: newScore,
             gamePhase: 'feedback'
           }));
-        }
-      }, 3000); // Longer delay for better UX
+        }, 3000);
+      }
     } else {
-      console.log('DEBUG Level Failed:', { wordsCorrect, totalPairs: gameState.totalPairs });
-      
-      // Level failed
-      setTransitionData({
-        title: "Level Failed",
-        description: `You got ${wordsCorrect} out of ${gameState.totalPairs} words correct. Try again!`,
-        type: 'error'
-      });
-      setShowTransition(true);
-      
-      setTimeout(() => {
-        setShowTransition(false);
-        console.log('DEBUG Level Failed - updating result:', {
-          mode: 'operation-span',
-          level: gameState.currentLevel,
-          score: gameState.currentScore,
-          mathCorrect: gameState.stats.mathCorrect,
-          mathIncorrect: gameState.stats.mathIncorrect,
-          wordsCorrect: gameState.stats.wordsCorrect
-        });
-        updateGameResult(
-          'operation-span', 
-          gameState.currentLevel, 
-          gameState.currentScore, 
-          gameState.stats.wordsCorrect, 
-          gameState.stats.mathIncorrect, 
-          gameState.stats.totalTime
-        );
-        setGameState(prev => ({
-          ...prev,
-          gamePhase: 'feedback'
-        }));
-      }, 3000);
+      // Move to next operation
+      setCurrentRecallIndex(prev => prev + 1);
+      setGameState(prev => ({
+        ...prev,
+        userRecallInput: ''
+      }));
     }
   };
 
@@ -344,6 +349,9 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
     const mathData = generateMathQuestion(1);
     setCurrentMathData(mathData);
     setCurrentWordData('');
+    setOperationWordPairs([]);
+    setShuffledRecallOperations([]);
+    setCurrentRecallIndex(0);
     
     setGameState({
       currentLevel: 1,
@@ -566,43 +574,74 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
             </motion.div>
           )}
 
-        {gameState.gamePhase === 'recall' && (
-          <Card>
-            <CardContent className="p-6">
-              <div className="text-center mb-6">
-                <h2 className="text-xl font-bold mb-2">Recall All Words</h2>
-                <p className="text-gray-600 mb-2">
-                  Enter all {gameState.totalPairs} words you remember
-                </p>
-                <p className="text-sm text-gray-500">
-                  Remember the words in the order they appeared
-                </p>
-              </div>
-              
-              <div className="text-center mb-6">
-                <Input
-                  value={gameState.userRecallInput}
-                  onChange={(e) => setGameState(prev => ({ ...prev, userRecallInput: e.target.value }))}
-                  onKeyPress={(e) => handleKeyPress(e, handleRecallSubmit)}
-                  placeholder="word1,word2,word3......"
-                  className="text-center text-lg max-w-md mx-auto"
-                />
-                <p className="text-xs text-gray-500 mt-2">
-                  Tip: Enter words separated by commas or spaces
-                </p>
-              </div>
-              
-              <div className="flex justify-center">
-                <Button 
-                  onClick={handleRecallSubmit}
-                  disabled={!gameState.userRecallInput}
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  Submit Recall
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+        {gameState.gamePhase === 'recall' && shuffledRecallOperations.length > 0 && (
+          <motion.div
+            key="recall-phase"
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 50 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Card>
+              <CardContent className="p-6">
+                <div className="text-center mb-6">
+                  <Calculator className="mx-auto text-blue-600 mb-4" size={48} />
+                  <h2 className="text-xl font-bold mb-2">Operation Recall Challenge</h2>
+                  <p className="text-gray-600 mb-2">
+                    What word was associated with this operation?
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Question {currentRecallIndex + 1} of {shuffledRecallOperations.length}
+                  </p>
+                </div>
+                
+                <div className="text-center mb-6">
+                  <motion.div 
+                    className="text-4xl font-bold text-blue-800 mb-6 p-4 bg-blue-50 rounded-lg inline-block"
+                    animate={{ scale: [1, 1.05, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    {shuffledRecallOperations[currentRecallIndex]?.operation} = ?
+                  </motion.div>
+                  
+                  <p className="text-lg text-gray-700 mb-4">
+                    Instead of the number, enter the word that was shown with this operation:
+                  </p>
+                  
+                  <Input
+                    value={gameState.userRecallInput}
+                    onChange={(e) => setGameState(prev => ({ ...prev, userRecallInput: e.target.value }))}
+                    onKeyPress={(e) => handleKeyPress(e, handleRecallSubmit)}
+                    placeholder="Enter the word..."
+                    className="text-center text-xl max-w-xs mx-auto"
+                  />
+                </div>
+                
+                <div className="flex justify-center">
+                  <Button 
+                    onClick={handleRecallSubmit}
+                    disabled={!gameState.userRecallInput}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    Submit Word
+                  </Button>
+                </div>
+                
+                <div className="mt-4 text-center">
+                  <AnimatedProgress 
+                    value={currentRecallIndex} 
+                    max={shuffledRecallOperations.length}
+                    color="bg-gradient-to-r from-blue-500 to-purple-500"
+                    height="h-2"
+                    showValue={false}
+                  />
+                  <p className="text-sm text-gray-500 mt-2">
+                    Progress: {currentRecallIndex} / {shuffledRecallOperations.length}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
         )}
 
         {gameState.gamePhase === 'feedback' && (
@@ -656,12 +695,14 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
                       <div className="space-y-2">
                         {gameState.mistakes.wordErrors.map((error, index) => (
                           <div key={index} className="bg-orange-50 p-3 rounded text-sm">
-                            <div className="font-medium">Level {error.level}: {error.correctCount}/{error.correctWords.length} correct</div>
-                            <div className="text-orange-700">
-                              Your words: {error.userWords.join(', ')}
+                            <div className="font-medium">
+                              Level {error.level}: {error.operation ? `Operation: ${error.operation}` : `${error.correctCount}/${error.correctWords.length} correct`}
                             </div>
                             <div className="text-orange-700">
-                              Correct words: {error.correctWords.join(', ')}
+                              Your answer: {error.userWords.join(', ')}
+                            </div>
+                            <div className="text-orange-700">
+                              Correct answer: {error.correctWords.join(', ')}
                             </div>
                           </div>
                         ))}
