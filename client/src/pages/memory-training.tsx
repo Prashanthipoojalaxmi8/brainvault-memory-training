@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { GameHeader } from "@/components/game-header";
 import { MainGameSelection } from "@/components/main-game-selection";
 import { WMSModeSelection } from "@/components/wms-mode-selection";
@@ -31,10 +32,12 @@ export default function MemoryTraining() {
     console.log('Navigating back to games - clearing current game and mode');
     setCurrentGame(null);
     setCurrentMode(null);
+    setShowInstructions(false);
   };
 
   const handleBackToModes = () => {
     setCurrentMode(null);
+    setShowInstructions(false);
   };
 
   const handleShowInstructions = () => {
@@ -53,6 +56,13 @@ export default function MemoryTraining() {
       />
       
       <main className="flex-1 max-w-4xl mx-auto w-full px-4 py-8">
+        {/* Debug info (can be removed in production) */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="text-xs text-gray-400 mb-2">
+            Debug: currentGame={currentGame}, currentMode={currentMode}
+          </div>
+        )}
+        
         {!currentGame && (
           <MainGameSelection 
             onSelectGame={handleSelectGame}
@@ -84,6 +94,16 @@ export default function MemoryTraining() {
             mode={currentMode} 
             onBackToMenu={handleBackToModes}
           />
+        )}
+        
+        {/* Fallback for edge cases - should not happen in normal operation */}
+        {currentGame && !currentMode && currentGame !== 'wechsler-memory-scale' && (
+          <div className="text-center py-12">
+            <p className="text-gray-600 mb-4">Something went wrong. Please go back to the main menu.</p>
+            <Button onClick={handleBackToGames} variant="outline">
+              Back to Menu
+            </Button>
+          </div>
         )}
       </main>
 

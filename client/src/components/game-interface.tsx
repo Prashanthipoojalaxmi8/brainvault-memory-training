@@ -171,7 +171,10 @@ export function GameInterface({ mode, onBackToMenu }: GameInterfaceProps) {
         description: `Final score: ${gameState.currentScore}`,
       });
       
-      onBackToMenu();
+      // Add a small delay to ensure the toast shows before navigation
+      setTimeout(() => {
+        onBackToMenu();
+      }, 2000);
       return;
     }
 
