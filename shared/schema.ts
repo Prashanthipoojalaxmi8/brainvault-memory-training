@@ -89,7 +89,7 @@ export interface OperationSpanState {
   };
   mistakes: {
     mathErrors: Array<{ level: number; question: string; userAnswer: string; correctAnswer: number }>;
-    wordErrors: Array<{ level: number; userWords: string[]; correctWords: string[]; correctCount: number }>;
+    wordErrors: Array<{ level: number; userWords: string[]; correctWords: string[]; correctCount: number; operation?: string }>;
   };
 }
 

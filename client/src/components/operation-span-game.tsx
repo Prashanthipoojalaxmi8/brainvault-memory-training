@@ -202,15 +202,19 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
 
   const handleRecallSubmit = () => {
     const currentOperation = shuffledRecallOperations[currentRecallIndex];
-    const userAnswer = gameState.userRecallInput.trim().toLowerCase();
+    const userAnswerRaw = gameState.userRecallInput.trim();
+    const userAnswer = userAnswerRaw.toLowerCase();
     const correctAnswer = currentOperation.word.toLowerCase();
     const isCorrect = userAnswer === correctAnswer;
     
     console.log('DEBUG Single Operation Recall:', {
       operation: currentOperation.operation,
-      userAnswer,
-      correctAnswer: currentOperation.word,
-      isCorrect
+      userAnswerOriginal: userAnswerRaw,
+      userAnswerLower: userAnswer,
+      correctAnswerOriginal: currentOperation.word,
+      correctAnswerLower: correctAnswer,
+      isCorrect,
+      comparison: `"${userAnswer}" === "${correctAnswer}" = ${isCorrect}`
     });
     
     // Update stats
@@ -227,7 +231,7 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
           ...prev.mistakes.wordErrors,
           {
             level: prev.currentLevel,
-            userWords: [userAnswer],
+            userWords: [userAnswerRaw],
             correctWords: [currentOperation.word],
             correctCount: 0,
             operation: currentOperation.operation
