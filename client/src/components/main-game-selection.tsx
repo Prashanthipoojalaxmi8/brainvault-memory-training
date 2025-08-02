@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Brain, Calculator, HelpCircle, RotateCcw, Puzzle, Layers } from "lucide-react";
+import { Brain, Calculator, HelpCircle, RotateCcw, Puzzle, Layers, Target } from "lucide-react";
 import { MainGame } from "@shared/schema";
 import { MAIN_GAMES } from "@/lib/main-games";
 import { getStoredProgress, resetProgress } from "@/lib/storage";
@@ -13,7 +13,7 @@ interface MainGameSelectionProps {
 const iconMap = {
   'brain': Brain,
   'calculator': Calculator,
-  'puzzle': Puzzle,
+  'puzzle': Target,
   'layers': Layers,
 };
 

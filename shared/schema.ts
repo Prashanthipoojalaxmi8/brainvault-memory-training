@@ -37,12 +37,13 @@ export type GameStats = typeof gameStats.$inferSelect;
 export type InsertGameStats = z.infer<typeof insertGameStatsSchema>;
 
 // Game mode types
-export type GameMode = 'ds-forward' | 'ds-backward' | 'spatial-forward' | 'spatial-backward' | 'operation-span' | 'wcst';
+export type GameMode = 'ds-forward' | 'ds-backward' | 'spatial-forward' | 'spatial-backward' | 'operation-span' | 'wcst' | 'digit-cancellation';
 export type GamePhase = 'menu' | 'display' | 'input' | 'feedback';
 export type OperationSpanPhase = 'math' | 'word' | 'recall' | 'feedback';
 export type WCSTPhase = 'display' | 'feedback' | 'complete';
+export type DCATPhase = 'instructions' | 'playing' | 'complete';
 // Main game categories
-export type MainGame = 'wechsler-memory-scale' | 'operation-span-task' | 'wisconsin-card-sorting-test';
+export type MainGame = 'wechsler-memory-scale' | 'operation-span-task' | 'wisconsin-card-sorting-test' | 'digit-cancellation-task';
 
 export interface MainGameConfig {
   title: string;
@@ -93,7 +94,27 @@ export interface OperationSpanState {
   };
 }
 
-
+// Digit Cancellation Task specific types
+export interface DCATState {
+  currentLevel: number;
+  targetDigits: number[];
+  grid: number[][];
+  markedPositions: Set<string>; // "row,col" format
+  gamePhase: DCATPhase;
+  timeRemaining: number;
+  timeLimit: number;
+  stats: {
+    hits: number; // correct targets marked
+    omissions: number; // targets missed
+    falsePositives: number; // non-targets marked
+    totalTargets: number;
+    accuracy: number;
+    speed: number; // targets per second
+  };
+  trial: number;
+  totalTrials: number;
+  gridSize: { rows: number; cols: number };
+}
 
 export interface ModeConfig {
   title: string;

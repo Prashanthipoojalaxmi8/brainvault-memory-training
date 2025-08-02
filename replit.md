@@ -36,6 +36,7 @@ The application follows a full-stack architecture with:
 4. **Spatial Span Backward**: Letter sequence recall in reverse order
 5. **Operation Span Task**: Math problems with word memorization and recall
 6. **Wisconsin Card Sorting Test**: Cognitive flexibility assessment through card matching with hidden rules
+7. **Digit Cancellation Task**: Sustained attention and visual scanning assessment through target digit identification in grids
 
 ## Data Flow
 
@@ -90,6 +91,7 @@ The build process creates:
 
 ```
 Changelog:
+- August 02, 2025. Added Digit Cancellation Task (D-CAT) with progressive difficulty levels, time pressure, and comprehensive attention assessment metrics
 - July 09, 2025. Added Wisconsin Card Sorting Test (WCST) with visual card matching, rule switching, and cognitive flexibility assessment
 - July 09, 2025. Fixed Operation Span Task validation issues: case-insensitive word matching, flexible input parsing (commas or spaces), removed error toasts during gameplay, improved placeholder text
 - July 09, 2025. Added comprehensive mistake tracking and summary display for Operation Span Task

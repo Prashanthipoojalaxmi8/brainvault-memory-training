@@ -22,6 +22,13 @@ export const MAIN_GAMES: Record<MainGame, MainGameConfig> = {
     color: 'purple',
     modes: ['wcst']
   },
+  'digit-cancellation-task': {
+    title: 'Digit Cancellation Task',
+    description: 'Test your sustained attention and visual scanning by quickly finding and marking target digits in a grid.',
+    icon: 'puzzle',
+    color: 'green',
+    modes: ['digit-cancellation']
+  },
 };
 
 export const WMS_MODES = {

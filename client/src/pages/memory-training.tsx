@@ -6,6 +6,7 @@ import { WMSModeSelection } from "@/components/wms-mode-selection";
 import { GameInterface } from "@/components/game-interface";
 import { OperationSpanGame } from "@/components/operation-span-game";
 import { WisconsinCardSortingTest } from "@/components/wisconsin-card-sorting-test";
+import { DigitCancellationTask } from "@/components/digit-cancellation-task";
 
 import { InstructionsModal } from "@/components/instructions-modal";
 import { GameMode, MainGame } from "@shared/schema";
@@ -21,6 +22,8 @@ export default function MemoryTraining() {
       setCurrentMode('operation-span');
     } else if (game === 'wisconsin-card-sorting-test') {
       setCurrentMode('wcst');
+    } else if (game === 'digit-cancellation-task') {
+      setCurrentMode('digit-cancellation');
     }
   };
 
@@ -88,8 +91,14 @@ export default function MemoryTraining() {
             onBackToMenu={handleBackToGames}
           />
         )}
+
+        {currentMode === 'digit-cancellation' && (
+          <DigitCancellationTask 
+            onBackToMenu={handleBackToGames}
+          />
+        )}
         
-        {currentMode && currentMode !== 'operation-span' && currentMode !== 'wcst' && (
+        {currentMode && currentMode !== 'operation-span' && currentMode !== 'wcst' && currentMode !== 'digit-cancellation' && (
           <GameInterface 
             mode={currentMode} 
             onBackToMenu={handleBackToModes}

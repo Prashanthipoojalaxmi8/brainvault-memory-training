@@ -1,0 +1,84 @@
+Sure! Here's a solid Replit app prompt for building a **Digit Cancellation Task (D-CAT)** game, with increasing difficulty, scoring, and optional cognitive twists. You can copy-paste this directly into Replit’s “Create Repl” → “Prompt” section:
+
+---
+
+### 🔢 **Digit Cancellation Task (D-CAT) – Cognitive Focus Game App**
+
+**Prompt:**
+
+> Build a browser-based **Digit Cancellation Task** game to assess and train attention. The app should display a grid of randomly generated digits. The user must cancel (click) on specific target digits as quickly and accurately as possible within a time limit.
+
+---
+
+### ✅ **Core Features**:
+
+1. **Grid Generator**:
+
+   * Display digits in a grid layout (e.g., 10x10).
+   * Digits should be randomly generated (0–9).
+
+2. **Target Selection**:
+
+   * Randomly choose 1–3 target digits per level.
+   * Display target(s) clearly at the top.
+
+3. **Click-to-Cancel**:
+
+   * Users click on digits to cancel them.
+   * Clicked digits change color or get crossed out.
+
+4. **Scoring System**:
+
+   * **Hits**: Correct target digits clicked.
+   * **Misses**: Targets that were not clicked.
+   * **False Positives**: Non-targets that were clicked.
+   * Display accuracy and speed score after each round.
+
+5. **Timer**:
+
+   * Limit each round to 60 seconds (configurable).
+   * Optional: Add a countdown visual or sound beep at the end.
+
+---
+
+### 🔼 **Difficulty Levels** (Optional Advanced Mode):
+
+* Level 1: 1 target digit, 10x10 grid.
+* Level 2: 2 target digits, 15x15 grid.
+* Level 3: 3 target digits, 20x20 grid + distractors.
+* Level 4: Same as above + time limit = 30s.
+* Level 5: Add a **secondary task** (e.g., play sound every 10s, user clicks spacebar when heard).
+
+---
+
+### 🎨 **Visual Options**:
+
+* Use light-colored background with high-contrast digits.
+* Optional toggle: “Noisy background” mode with faint patterns.
+* Animations when digits are canceled (e.g., fade or pop effect).
+
+---
+
+### 🧠 **Extra Features** (For bonus cognitive challenge):
+
+* **Target-switching mode**: Mid-game, the target digit changes (alert user visually).
+* **Inhibition mode**: User must cancel **all digits except** the target digit(s).
+* **Symbol/Letter Mode**: Swap digits with letters or shapes for generalization.
+
+---
+
+### 🔧 **Tech Stack Suggestions**:
+
+* **Frontend**: HTML, CSS (Tailwind or custom), JavaScript (Vanilla or React.js)
+* **Backend/Storage** (Optional): Store scores with Firebase or localStorage
+* **Audio**: Add feedback sounds for clicks, timeouts, or errors
+
+---
+
+Let me know if you want:
+
+* A code scaffold to kickstart the project
+* Design mockup or wireframe
+* Replit-ready starter template
+
+Want me to generate a cute but professional UI for it too?
