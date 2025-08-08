@@ -37,6 +37,7 @@ The application follows a full-stack architecture with:
 5. **Operation Span Task**: Math problems with word memorization and recall
 6. **Wisconsin Card Sorting Test**: Cognitive flexibility assessment through card matching with hidden rules
 7. **Digit Cancellation Task**: Sustained attention and visual scanning assessment through target digit identification in grids
+8. **Trail Making Test**: Visual scanning and cognitive flexibility assessment with TMT-A (numbers) and TMT-B (alternating numbers/letters) modes
 
 ## Data Flow
 
@@ -91,6 +92,8 @@ The build process creates:
 
 ```
 Changelog:
+- August 08, 2025. Added Trail Making Test (TMT) with TMT-A (numbers 1-25) and TMT-B (alternating numbers/letters) modes, including session mode with B-A difference calculation and comprehensive error tracking
+- August 08, 2025. Fixed Operation Span Task error display issues and improved word validation case sensitivity
 - August 02, 2025. Added Digit Cancellation Task (D-CAT) with progressive difficulty levels, time pressure, and comprehensive attention assessment metrics
 - July 09, 2025. Added Wisconsin Card Sorting Test (WCST) with visual card matching, rule switching, and cognitive flexibility assessment
 - July 09, 2025. Fixed Operation Span Task validation issues: case-insensitive word matching, flexible input parsing (commas or spaces), removed error toasts during gameplay, improved placeholder text

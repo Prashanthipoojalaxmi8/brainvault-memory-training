@@ -7,6 +7,7 @@ import { GameInterface } from "@/components/game-interface";
 import { OperationSpanGame } from "@/components/operation-span-game";
 import { WisconsinCardSortingTest } from "@/components/wisconsin-card-sorting-test";
 import { DigitCancellationTask } from "@/components/digit-cancellation-task";
+import { TrailMakingTest } from "@/components/trail-making-test";
 
 import { InstructionsModal } from "@/components/instructions-modal";
 import { GameMode, MainGame } from "@shared/schema";
@@ -24,6 +25,9 @@ export default function MemoryTraining() {
       setCurrentMode('wcst');
     } else if (game === 'digit-cancellation-task') {
       setCurrentMode('digit-cancellation');
+    } else if (game === 'trail-making-test') {
+      // TMT handles its own mode selection internally
+      setCurrentMode('tmt-a'); // Set a default mode for routing purposes
     }
   };
 
@@ -97,8 +101,14 @@ export default function MemoryTraining() {
             onBackToMenu={handleBackToGames}
           />
         )}
+
+        {(currentMode === 'tmt-a' || currentMode === 'tmt-b') && (
+          <TrailMakingTest 
+            onBackToMenu={handleBackToGames}
+          />
+        )}
         
-        {currentMode && currentMode !== 'operation-span' && currentMode !== 'wcst' && currentMode !== 'digit-cancellation' && (
+        {currentMode && currentMode !== 'operation-span' && currentMode !== 'wcst' && currentMode !== 'digit-cancellation' && currentMode !== 'tmt-a' && currentMode !== 'tmt-b' && (
           <GameInterface 
             mode={currentMode} 
             onBackToMenu={handleBackToModes}

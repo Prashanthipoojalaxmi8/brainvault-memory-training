@@ -37,13 +37,13 @@ export type GameStats = typeof gameStats.$inferSelect;
 export type InsertGameStats = z.infer<typeof insertGameStatsSchema>;
 
 // Game mode types
-export type GameMode = 'ds-forward' | 'ds-backward' | 'spatial-forward' | 'spatial-backward' | 'operation-span' | 'wcst' | 'digit-cancellation';
+export type GameMode = 'ds-forward' | 'ds-backward' | 'spatial-forward' | 'spatial-backward' | 'operation-span' | 'wcst' | 'digit-cancellation' | 'tmt-a' | 'tmt-b';
 export type GamePhase = 'menu' | 'display' | 'input' | 'feedback';
 export type OperationSpanPhase = 'math' | 'word' | 'recall' | 'feedback';
 export type WCSTPhase = 'display' | 'feedback' | 'complete';
 export type DCATPhase = 'instructions' | 'playing' | 'complete';
 // Main game categories
-export type MainGame = 'wechsler-memory-scale' | 'operation-span-task' | 'wisconsin-card-sorting-test' | 'digit-cancellation-task';
+export type MainGame = 'wechsler-memory-scale' | 'operation-span-task' | 'wisconsin-card-sorting-test' | 'digit-cancellation-task' | 'trail-making-test';
 
 export interface MainGameConfig {
   title: string;

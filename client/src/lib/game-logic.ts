@@ -48,6 +48,30 @@ export const MODES: Record<GameMode, ModeConfig> = {
     reverse: false,
     icon: 'layers',
     color: 'purple'
+  },
+  'digit-cancellation': {
+    title: 'Digit Cancellation Task',
+    description: 'Test your sustained attention by quickly identifying and marking target digits.',
+    type: 'mixed',
+    reverse: false,
+    icon: 'target',
+    color: 'blue'
+  },
+  'tmt-a': {
+    title: 'Trail Making Test A',
+    description: 'Connect numbers 1-25 in ascending order as quickly as possible.',
+    type: 'mixed',
+    reverse: false,
+    icon: 'target',
+    color: 'blue'
+  },
+  'tmt-b': {
+    title: 'Trail Making Test B',
+    description: 'Alternate between numbers and letters in sequence (1-A-2-B-3-C...).',
+    type: 'mixed',
+    reverse: false,
+    icon: 'rotate-ccw',
+    color: 'purple'
   }
 };
 

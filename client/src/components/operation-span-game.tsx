@@ -700,7 +700,7 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
                         {gameState.mistakes.wordErrors.map((error, index) => (
                           <div key={index} className="bg-orange-50 p-3 rounded text-sm">
                             <div className="font-medium">
-                              Level {error.level}: {error.operation ? `Operation: ${error.operation}` : `${error.correctCount}/${error.correctWords.length} correct`}
+                              Level {error.level}: {error.correctCount}/{error.correctWords.length} correct
                             </div>
                             <div className="text-orange-700">
                               Your answer: {error.userWords.join(', ')}

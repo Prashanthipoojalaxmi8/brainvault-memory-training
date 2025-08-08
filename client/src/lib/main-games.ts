@@ -29,6 +29,13 @@ export const MAIN_GAMES: Record<MainGame, MainGameConfig> = {
     color: 'green',
     modes: ['digit-cancellation']
   },
+  'trail-making-test': {
+    title: 'Trail Making Test',
+    description: 'Test visual scanning, cognitive flexibility, and processing speed by connecting numbers and letters in sequence.',
+    icon: 'brain',
+    color: 'blue',
+    modes: ['tmt-a', 'tmt-b']
+  },
 };
 
 export const WMS_MODES = {
