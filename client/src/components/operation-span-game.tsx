@@ -202,18 +202,23 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
 
   const handleRecallSubmit = () => {
     const currentOperation = shuffledRecallOperations[currentRecallIndex];
-    const userAnswerRaw = gameState.userRecallInput.trim();
-    const userAnswer = userAnswerRaw.toLowerCase();
-    const correctAnswer = currentOperation.word.toLowerCase();
+    
+    // Clean both answers thoroughly
+    const userAnswerRaw = gameState.userRecallInput;
+    const userAnswer = userAnswerRaw.trim().toLowerCase().replace(/\s+/g, '');
+    const correctAnswer = currentOperation.word.trim().toLowerCase().replace(/\s+/g, '');
     const isCorrect = userAnswer === correctAnswer;
     
     console.log('DEBUG Single Operation Recall:', {
       operation: currentOperation.operation,
       userAnswerOriginal: userAnswerRaw,
-      userAnswerLower: userAnswer,
+      userAnswerCleaned: userAnswer,
       correctAnswerOriginal: currentOperation.word,
-      correctAnswerLower: correctAnswer,
+      correctAnswerCleaned: correctAnswer,
+      userLength: userAnswer.length,
+      correctLength: correctAnswer.length,
       isCorrect,
+      charComparison: userAnswer.split('').map((char, i) => `${char}(${char.charCodeAt(0)}) vs ${correctAnswer[i]}(${correctAnswer[i]?.charCodeAt(0) || 'undefined'})`),
       comparison: `"${userAnswer}" === "${correctAnswer}" = ${isCorrect}`
     });
     
