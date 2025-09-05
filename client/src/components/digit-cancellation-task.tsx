@@ -71,6 +71,7 @@ export function DigitCancellationTask({ onBackToMenu }: DigitCancellationTaskPro
   // Start new trial
   const startTrial = useCallback(() => {
     const { grid, targetCount, config } = generateGrid(gameState.currentLevel);
+    const currentTime = Date.now();
     
     setGameState(prev => ({
       ...prev,
@@ -79,6 +80,8 @@ export function DigitCancellationTask({ onBackToMenu }: DigitCancellationTaskPro
       markedPositions: new Set(),
       gamePhase: 'playing',
       timeRemaining: prev.timeLimit,
+      startTime: currentTime,
+      completionTime: 0,
       stats: {
         ...prev.stats,
         totalTargets: targetCount
@@ -135,6 +138,9 @@ export function DigitCancellationTask({ onBackToMenu }: DigitCancellationTaskPro
   }, [gameState.gamePhase, gameState.timeRemaining]);
 
   const finishTrial = useCallback(() => {
+    const endTime = Date.now();
+    const timeUsed = gameState.startTime ? Math.round((endTime - gameState.startTime) / 1000) : gameState.timeLimit - gameState.timeRemaining;
+    
     // Calculate omissions (targets not marked)
     let omissions = 0;
     gameState.grid.forEach((row, rowIndex) => {
@@ -152,19 +158,31 @@ export function DigitCancellationTask({ onBackToMenu }: DigitCancellationTaskPro
     const accuracy = gameState.stats.totalTargets > 0 
       ? (gameState.stats.hits / gameState.stats.totalTargets) * 100 
       : 0;
-    const speed = gameState.stats.hits / (gameState.timeLimit - gameState.timeRemaining || 1);
+    const speed = gameState.stats.hits / (timeUsed || 1);
+
+    // Store trial result
+    const trialResult = {
+      trial: gameState.trial,
+      level: gameState.currentLevel,
+      timeUsed,
+      timeLimit: gameState.timeLimit,
+      hits: gameState.stats.hits,
+      accuracy: Math.round(accuracy)
+    };
 
     setGameState(prev => ({
       ...prev,
       gamePhase: 'complete',
+      completionTime: timeUsed,
       stats: {
         ...prev.stats,
         omissions,
         accuracy: Math.round(accuracy),
         speed: Math.round(speed * 100) / 100
-      }
+      },
+      trialResults: [...prev.trialResults, trialResult]
     }));
-  }, [gameState.grid, gameState.targetDigits, gameState.markedPositions, gameState.stats, gameState.timeLimit, gameState.timeRemaining]);
+  }, [gameState.grid, gameState.targetDigits, gameState.markedPositions, gameState.stats, gameState.timeLimit, gameState.timeRemaining, gameState.startTime, gameState.trial, gameState.currentLevel]);
 
   const nextTrial = useCallback(() => {
     if (gameState.trial < gameState.totalTrials) {
@@ -173,7 +191,7 @@ export function DigitCancellationTask({ onBackToMenu }: DigitCancellationTaskPro
         currentLevel: prev.currentLevel + 1,
         trial: prev.trial + 1,
         gamePhase: 'instructions',
-        timeLimit: Math.max(30, prev.timeLimit - 10) // Reduce time each trial
+        timeLimit: Math.min(120, prev.timeLimit + 15) // Increase time each trial for higher difficulty
       }));
     } else {
       onBackToMenu();
@@ -187,8 +205,11 @@ export function DigitCancellationTask({ onBackToMenu }: DigitCancellationTaskPro
       grid: [],
       markedPositions: new Set<string>(),
       gamePhase: 'instructions',
-      timeRemaining: 60,
-      timeLimit: 60,
+      timeRemaining: 45,
+      timeLimit: 45,
+      startTime: null,
+      completionTime: 0,
+      trialResults: [],
       stats: {
         hits: 0,
         omissions: 0,
@@ -305,17 +326,40 @@ export function DigitCancellationTask({ onBackToMenu }: DigitCancellationTaskPro
               </div>
             </div>
 
-            <div className="text-center">
+            <div className="text-center space-y-3">
               <div className="text-lg font-semibold mb-2">Speed: {gameState.stats.speed} targets/sec</div>
+              <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
+                <div className="text-2xl font-bold text-purple-600 mb-1">{gameState.completionTime}s</div>
+                <div className="text-sm text-purple-800 dark:text-purple-200">Time Used (out of {gameState.timeLimit}s allowed)</div>
+              </div>
               <div className="text-sm text-gray-600 dark:text-gray-300">
                 {gameState.stats.totalTargets} total targets in grid
               </div>
             </div>
 
+            {/* Show trial history if we have completed multiple trials */}
+            {gameState.trialResults.length > 1 && gameState.trial >= gameState.totalTrials && (
+              <div className="mt-6">
+                <h3 className="text-lg font-semibold mb-3 text-center">Session Summary</h3>
+                <div className="space-y-2">
+                  {gameState.trialResults.map((result, index) => (
+                    <div key={index} className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded">
+                      <span className="font-medium">Trial {result.trial} (Level {result.level}):</span>
+                      <div className="flex gap-4 text-sm">
+                        <span className="text-blue-600">{result.timeUsed}s / {result.timeLimit}s</span>
+                        <span className="text-green-600">{result.hits} hits</span>
+                        <span className="text-purple-600">{result.accuracy}% accuracy</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="flex justify-center gap-4">
               {gameState.trial < gameState.totalTrials ? (
                 <Button onClick={nextTrial} className="bg-blue-600 hover:bg-blue-700">
-                  Next Trial (Level {gameState.currentLevel + 1})
+                  Next Trial (Level {gameState.currentLevel + 1}) - {Math.min(120, gameState.timeLimit + 15)}s time limit
                 </Button>
               ) : (
                 <Button onClick={resetGame} className="bg-green-600 hover:bg-green-700">

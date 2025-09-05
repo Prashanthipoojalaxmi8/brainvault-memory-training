@@ -103,6 +103,8 @@ export interface DCATState {
   gamePhase: DCATPhase;
   timeRemaining: number;
   timeLimit: number;
+  startTime: number | null;
+  completionTime: number;
   stats: {
     hits: number; // correct targets marked
     omissions: number; // targets missed
@@ -114,6 +116,14 @@ export interface DCATState {
   trial: number;
   totalTrials: number;
   gridSize: { rows: number; cols: number };
+  trialResults: Array<{
+    trial: number;
+    level: number;
+    timeUsed: number;
+    timeLimit: number;
+    hits: number;
+    accuracy: number;
+  }>;
 }
 
 export interface ModeConfig {
