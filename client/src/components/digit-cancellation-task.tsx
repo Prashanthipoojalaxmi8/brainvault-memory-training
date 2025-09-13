@@ -10,37 +10,51 @@ interface DigitCancellationTaskProps {
   onBackToMenu: () => void;
 }
 
+// Shared difficulty configuration to avoid duplication
+const DIFFICULTY_LEVELS = {
+  1: { rows: 10, cols: 10, targets: [6] },
+  2: { rows: 12, cols: 12, targets: [4, 6] },
+  3: { rows: 15, cols: 15, targets: [3, 6, 9] }
+};
+
 export function DigitCancellationTask({ onBackToMenu }: DigitCancellationTaskProps) {
-  const [gameState, setGameState] = useState<DCATState>(() => ({
-    currentLevel: 1,
-    targetDigits: [6],
-    grid: [],
-    markedPositions: new Set<string>(),
-    gamePhase: 'instructions',
-    timeRemaining: 60,
-    timeLimit: 60,
-    stats: {
-      hits: 0,
-      omissions: 0,
-      falsePositives: 0,
-      totalTargets: 0,
-      accuracy: 0,
-      speed: 0
-    },
-    trial: 1,
-    totalTrials: 3,
-    gridSize: { rows: 10, cols: 10 }
-  }));
+  const [gameState, setGameState] = useState<DCATState>(() => {
+    const initialTimeLimit = 60; // Level 1 has 1 target digit, so 60 + (1-1)*20 = 60s
+    return {
+      currentLevel: 1,
+      targetDigits: [6],
+      grid: [],
+      markedPositions: new Set<string>(),
+      gamePhase: 'instructions',
+      timeRemaining: initialTimeLimit,
+      timeLimit: initialTimeLimit,
+      startTime: null,
+      completionTime: 0,
+      trialResults: [],
+      stats: {
+        hits: 0,
+        omissions: 0,
+        falsePositives: 0,
+        totalTargets: 0,
+        accuracy: 0,
+        speed: 0
+      },
+      trial: 1,
+      totalTrials: 3,
+      gridSize: { rows: 10, cols: 10 }
+    };
+  });
+
+  // Calculate time limit based on number of target digits
+  const calculateTimeLimit = useCallback((numberOfTargets: number) => {
+    // Base time: 60 seconds for 1 target
+    // Additional time: +20 seconds per additional target
+    return 60 + (numberOfTargets - 1) * 20;
+  }, []);
 
   // Generate random grid based on difficulty
   const generateGrid = useCallback((level: number) => {
-    const difficulty = {
-      1: { rows: 10, cols: 10, targets: [6] },
-      2: { rows: 12, cols: 12, targets: [4, 6] },
-      3: { rows: 15, cols: 15, targets: [3, 6, 9] }
-    };
-
-    const config = difficulty[level as keyof typeof difficulty] || difficulty[1];
+    const config = DIFFICULTY_LEVELS[level as keyof typeof DIFFICULTY_LEVELS] || DIFFICULTY_LEVELS[1];
     const grid: number[][] = [];
     let targetCount = 0;
 
@@ -186,27 +200,40 @@ export function DigitCancellationTask({ onBackToMenu }: DigitCancellationTaskPro
 
   const nextTrial = useCallback(() => {
     if (gameState.trial < gameState.totalTrials) {
+      const nextLevel = gameState.currentLevel + 1;
+      const nextConfig = DIFFICULTY_LEVELS[nextLevel as keyof typeof DIFFICULTY_LEVELS] || DIFFICULTY_LEVELS[1];
+      const newTimeLimit = calculateTimeLimit(nextConfig.targets.length);
+      
       setGameState(prev => ({
         ...prev,
-        currentLevel: prev.currentLevel + 1,
+        currentLevel: nextLevel,
         trial: prev.trial + 1,
         gamePhase: 'instructions',
-        timeLimit: Math.min(120, prev.timeLimit + 15) // Increase time each trial for higher difficulty
+        timeLimit: newTimeLimit // Time based on number of target digits: 60s for 1, 80s for 2, 100s for 3
       }));
     } else {
       onBackToMenu();
     }
-  }, [gameState.trial, gameState.totalTrials, onBackToMenu]);
+  }, [gameState.trial, gameState.totalTrials, gameState.currentLevel, onBackToMenu, calculateTimeLimit]);
+
+  // Helper function to get next trial info
+  const getNextTrialInfo = useCallback(() => {
+    const nextLevel = gameState.currentLevel + 1;
+    const nextConfig = DIFFICULTY_LEVELS[nextLevel as keyof typeof DIFFICULTY_LEVELS] || DIFFICULTY_LEVELS[1];
+    const nextTimeLimit = calculateTimeLimit(nextConfig.targets.length);
+    return { nextLevel, nextTimeLimit };
+  }, [gameState.currentLevel, calculateTimeLimit]);
 
   const resetGame = useCallback(() => {
+    const initialTimeLimit = calculateTimeLimit(1); // Level 1 has 1 target digit
     setGameState({
       currentLevel: 1,
       targetDigits: [6],
       grid: [],
       markedPositions: new Set<string>(),
       gamePhase: 'instructions',
-      timeRemaining: 45,
-      timeLimit: 45,
+      timeRemaining: initialTimeLimit,
+      timeLimit: initialTimeLimit,
       startTime: null,
       completionTime: 0,
       trialResults: [],
@@ -222,7 +249,7 @@ export function DigitCancellationTask({ onBackToMenu }: DigitCancellationTaskPro
       totalTrials: 3,
       gridSize: { rows: 10, cols: 10 }
     });
-  }, []);
+  }, [calculateTimeLimit]);
 
   if (gameState.gamePhase === 'instructions') {
     return (
@@ -359,7 +386,7 @@ export function DigitCancellationTask({ onBackToMenu }: DigitCancellationTaskPro
             <div className="flex justify-center gap-4">
               {gameState.trial < gameState.totalTrials ? (
                 <Button onClick={nextTrial} className="bg-blue-600 hover:bg-blue-700">
-                  Next Trial (Level {gameState.currentLevel + 1}) - {Math.min(120, gameState.timeLimit + 15)}s time limit
+                  Next Trial (Level {getNextTrialInfo().nextLevel}) - {getNextTrialInfo().nextTimeLimit}s time limit
                 </Button>
               ) : (
                 <Button onClick={resetGame} className="bg-green-600 hover:bg-green-700">
