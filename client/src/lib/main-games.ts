@@ -36,6 +36,13 @@ export const MAIN_GAMES: Record<MainGame, MainGameConfig> = {
     color: 'blue',
     modes: ['tmt-a', 'tmt-b']
   },
+  'stroop-color-game': {
+    title: 'Stroop Color Game',
+    description: 'Test your cognitive control by identifying the color of words while ignoring the word itself. Classic attention and processing speed test.',
+    icon: 'palette',
+    color: 'rainbow',
+    modes: ['stroop-color']
+  },
 };
 
 export const WMS_MODES = {

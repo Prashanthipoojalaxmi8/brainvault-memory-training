@@ -8,6 +8,7 @@ import { OperationSpanGame } from "@/components/operation-span-game";
 import { WisconsinCardSortingTest } from "@/components/wisconsin-card-sorting-test";
 import { DigitCancellationTask } from "@/components/digit-cancellation-task";
 import { TrailMakingTest } from "@/components/trail-making-test";
+import { StroopColorGame } from "@/components/stroop-color-game";
 
 import { InstructionsModal } from "@/components/instructions-modal";
 import { GameMode, MainGame } from "@shared/schema";
@@ -28,6 +29,8 @@ export default function MemoryTraining() {
     } else if (game === 'trail-making-test') {
       // TMT handles its own mode selection internally
       setCurrentMode('tmt-a'); // Set a default mode for routing purposes
+    } else if (game === 'stroop-color-game') {
+      setCurrentMode('stroop-color');
     }
   };
 
@@ -107,8 +110,14 @@ export default function MemoryTraining() {
             onBackToMenu={handleBackToGames}
           />
         )}
+
+        {currentMode === 'stroop-color' && (
+          <StroopColorGame 
+            onBackToMenu={handleBackToGames}
+          />
+        )}
         
-        {currentMode && currentMode !== 'operation-span' && currentMode !== 'wcst' && currentMode !== 'digit-cancellation' && currentMode !== 'tmt-a' && currentMode !== 'tmt-b' && (
+        {currentMode && currentMode !== 'operation-span' && currentMode !== 'wcst' && currentMode !== 'digit-cancellation' && currentMode !== 'tmt-a' && currentMode !== 'tmt-b' && currentMode !== 'stroop-color' && (
           <GameInterface 
             mode={currentMode} 
             onBackToMenu={handleBackToModes}

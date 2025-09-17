@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Brain, Calculator, HelpCircle, RotateCcw, Puzzle, Layers, Target } from "lucide-react";
+import { Brain, Calculator, HelpCircle, RotateCcw, Puzzle, Layers, Target, Palette } from "lucide-react";
 import { MainGame } from "@shared/schema";
 import { MAIN_GAMES } from "@/lib/main-games";
 import { getStoredProgress, resetProgress } from "@/lib/storage";
@@ -15,6 +15,7 @@ const iconMap = {
   'calculator': Calculator,
   'puzzle': Target,
   'layers': Layers,
+  'palette': Palette,
 };
 
 const backgroundColorMap = {
@@ -22,6 +23,7 @@ const backgroundColorMap = {
   red: 'bg-gradient-to-br from-red-400 to-red-600',
   green: 'bg-gradient-to-br from-green-400 to-green-600',
   purple: 'bg-gradient-to-br from-purple-400 to-purple-600',
+  rainbow: 'bg-gradient-to-br from-purple-400 via-pink-400 to-red-400',
 };
 
 export function MainGameSelection({ onSelectGame, onShowInstructions }: MainGameSelectionProps) {

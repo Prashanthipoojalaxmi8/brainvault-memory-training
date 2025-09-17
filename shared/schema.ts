@@ -37,13 +37,13 @@ export type GameStats = typeof gameStats.$inferSelect;
 export type InsertGameStats = z.infer<typeof insertGameStatsSchema>;
 
 // Game mode types
-export type GameMode = 'ds-forward' | 'ds-backward' | 'spatial-forward' | 'spatial-backward' | 'operation-span' | 'wcst' | 'digit-cancellation' | 'tmt-a' | 'tmt-b';
+export type GameMode = 'ds-forward' | 'ds-backward' | 'spatial-forward' | 'spatial-backward' | 'operation-span' | 'wcst' | 'digit-cancellation' | 'tmt-a' | 'tmt-b' | 'stroop-color';
 export type GamePhase = 'menu' | 'display' | 'input' | 'feedback';
 export type OperationSpanPhase = 'math' | 'word' | 'recall' | 'feedback';
 export type WCSTPhase = 'display' | 'feedback' | 'complete';
 export type DCATPhase = 'instructions' | 'playing' | 'complete';
 // Main game categories
-export type MainGame = 'wechsler-memory-scale' | 'operation-span-task' | 'wisconsin-card-sorting-test' | 'digit-cancellation-task' | 'trail-making-test';
+export type MainGame = 'wechsler-memory-scale' | 'operation-span-task' | 'wisconsin-card-sorting-test' | 'digit-cancellation-task' | 'trail-making-test' | 'stroop-color-game';
 
 export interface MainGameConfig {
   title: string;
@@ -160,4 +160,25 @@ export interface WCSTState {
     ruleBreaks: number;
   };
   isComplete: boolean;
+}
+
+// Stroop Color Game specific types
+export type StroopPhase = 'instructions' | 'playing' | 'roundComplete' | 'gameComplete';
+
+export interface StroopState {
+  gamePhase: StroopPhase;
+  currentRound: number;
+  totalRounds: number;
+  score: number;
+  timeRemaining: number;
+  currentWord: string;
+  currentColor: string;
+  userInput: string;
+  roundStartTime: number | null;
+  stats: {
+    totalAttempts: number;
+    correctAnswers: number;
+    averageResponseTime: number;
+    roundScores: number[];
+  };
 }

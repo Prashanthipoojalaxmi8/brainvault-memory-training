@@ -1,0 +1,98 @@
+import tkinter as tk
+import random
+import time
+
+# Colors to use
+colors = ["Red", "Green", "Blue", "Yellow", "Purple", "Pink", "Orange", "Cyan"]
+
+# Round settings: total time per round
+rounds = [
+    {"time": 20},  # Round 1
+    {"time": 25},  # Round 2
+    {"time": 30},  # Round 3
+    {"time": 35},  # Round 4
+    {"time": 40},  # Round 5
+]
+
+score = 0
+round_index = 0
+game_running = False
+current_color = ""
+
+# Tkinter setup
+root = tk.Tk()
+root.title("Stroop Color Game")
+root.geometry("600x400")
+
+instruction = tk.Label(root, text="Type the COLOR of the text, not the word!", font=("Arial", 16))
+instruction.pack(pady=20)
+
+score_label = tk.Label(root, text="Score: 0", font=("Arial", 14))
+score_label.pack()
+
+round_label = tk.Label(root, text="Round 1", font=("Arial", 14))
+round_label.pack()
+
+timer_label = tk.Label(root, text="Time: 0", font=("Arial", 14))
+timer_label.pack()
+
+word_label = tk.Label(root, text="", font=("Arial", 40, "bold"))
+word_label.pack(pady=50)
+
+entry = tk.Entry(root, font=("Arial", 16))
+entry.pack()
+
+status_label = tk.Label(root, text="", font=("Arial", 12))
+status_label.pack(pady=20)
+
+
+def next_word():
+    global current_color
+    if not game_running:
+        return
+
+    word = random.choice(colors)
+    current_color = random.choice(colors)
+    word_label.config(text=word, fg=current_color)
+    entry.delete(0, tk.END)
+
+
+def check_answer(event=None):
+    global score
+    if not game_running:
+        return
+
+    answer = entry.get().strip().capitalize()
+    if answer == current_color:
+        score += 1
+        score_label.config(text=f"Score: {score}")
+    next_word()
+
+
+def start_round():
+    global round_index, score, game_running
+    if round_index >= len(rounds):
+        status_label.config(text=f"🎉 Game Over! Final Score: {score}")
+        word_label.config(text="")
+        return
+
+    game_running = True
+    round_time = rounds[round_index]["time"]
+
+    round_label.config(text=f"Round {round_index + 1}")
+    status_label.config(text="")
+    next_word()
+
+    start_time = time.time()
+
+    def update_timer():
+        nonlocal start_time
+        if not game_running:
+            return
+        elapsed = int(time.time() - start_time)
+        remaining = round_time - elapsed
+        if remaining <= 0:
+            end_round()
+        else:
+            timer_label.config(text=f"Time: {remaining}")
+            root.
