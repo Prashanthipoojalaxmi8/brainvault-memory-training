@@ -124,15 +124,12 @@ export default function MemoryTraining() {
           />
         )}
         
-        {/* Fallback for edge cases - should not happen in normal operation */}
-        {currentGame && !currentMode && currentGame !== 'wechsler-memory-scale' && currentGame !== 'stroop-color-game' && (
-          <div className="text-center py-12">
-            <p className="text-gray-600 mb-4">Something went wrong. Please go back to the main menu.</p>
-            <Button onClick={handleBackToGames} variant="outline">
-              Back to Menu
-            </Button>
-          </div>
-        )}
+        {/* Auto-redirect to main menu if in invalid state */}
+        {currentGame && !currentMode && currentGame !== 'wechsler-memory-scale' && (() => {
+          // Automatically return to main menu for invalid states
+          setTimeout(() => handleBackToGames(), 0);
+          return null;
+        })()}
       </main>
 
       <InstructionsModal 

@@ -72,6 +72,14 @@ export const MODES: Record<GameMode, ModeConfig> = {
     reverse: false,
     icon: 'rotate-ccw',
     color: 'purple'
+  },
+  'stroop-color': {
+    title: 'Stroop Color Game',
+    description: 'Test your attention control by identifying colors while ignoring word meanings.',
+    type: 'mixed',
+    reverse: false,
+    icon: 'palette',
+    color: 'rainbow'
   }
 };
 
