@@ -125,7 +125,7 @@ export default function MemoryTraining() {
         )}
         
         {/* Fallback for edge cases - should not happen in normal operation */}
-        {currentGame && !currentMode && currentGame !== 'wechsler-memory-scale' && (
+        {currentGame && !currentMode && currentGame !== 'wechsler-memory-scale' && currentGame !== 'stroop-color-game' && (
           <div className="text-center py-12">
             <p className="text-gray-600 mb-4">Something went wrong. Please go back to the main menu.</p>
             <Button onClick={handleBackToGames} variant="outline">
