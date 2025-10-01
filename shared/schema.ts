@@ -92,6 +92,7 @@ export interface OperationSpanState {
     mathErrors: Array<{ level: number; question: string; userAnswer: string; correctAnswer: number }>;
     wordErrors: Array<{ level: number; userWords: string[]; correctWords: string[]; correctCount: number; operation?: string }>;
   };
+  wordRecalls: Array<{ userAnswer: string; correctAnswer: string; isCorrect: boolean; level: number; operation: string }>;
 }
 
 // Digit Cancellation Task specific types

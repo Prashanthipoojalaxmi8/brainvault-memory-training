@@ -56,7 +56,8 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
     mistakes: {
       mathErrors: [],
       wordErrors: []
-    }
+    },
+    wordRecalls: []
   });
 
   // Store operation-word pairs for the recall phase
@@ -223,7 +224,7 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
       comparison: `"${userAnswer}" === "${correctAnswer}" = ${isCorrect}`
     });
     
-    // Update stats
+    // Update stats and track ALL word recalls
     setGameState(prev => ({
       ...prev,
       stats: {
@@ -243,7 +244,17 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
             operation: currentOperation.operation
           }
         ]
-      }
+      },
+      wordRecalls: [
+        ...prev.wordRecalls,
+        {
+          userAnswer: userAnswerRaw,
+          correctAnswer: currentOperation.word,
+          isCorrect,
+          level: prev.currentLevel,
+          operation: currentOperation.operation
+        }
+      ]
     }));
 
     // Check if this was the last operation
@@ -385,7 +396,8 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
       mistakes: {
         mathErrors: [],
         wordErrors: []
-      }
+      },
+      wordRecalls: []
     });
   };
 
@@ -702,20 +714,13 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
                 >
                   <h4 className="font-semibold text-green-700 dark:text-green-300 mb-3">✓ Correct Words:</h4>
                   {(() => {
-                    const correctWords: string[] = [];
-                    gameState.mistakes.wordErrors.forEach((error) => {
-                      error.correctWords.forEach((word, idx) => {
-                        if (error.userWords[idx]?.toLowerCase() === word.toLowerCase()) {
-                          correctWords.push(word);
-                        }
-                      });
-                    });
+                    const correctWords = gameState.wordRecalls.filter(recall => recall.isCorrect);
                     
                     return correctWords.length > 0 ? (
                       <div className="flex flex-wrap gap-2">
-                        {correctWords.map((word, idx) => (
+                        {correctWords.map((recall, idx) => (
                           <span key={idx} className="bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-100 px-3 py-1 rounded-full text-sm font-medium">
-                            {word}
+                            {recall.correctAnswer}
                           </span>
                         ))}
                       </div>
@@ -736,41 +741,29 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
                 >
                   <h4 className="font-semibold text-red-700 dark:text-red-300 mb-3">✗ Incorrect Words:</h4>
                   <div className="space-y-3">
-                    {gameState.mistakes.wordErrors.map((error, errorIdx) => (
-                      <div key={errorIdx}>
-                        {error.correctWords.map((word, idx) => {
-                          const userWord = error.userWords[idx] || '';
-                          const isIncorrect = userWord.toLowerCase() !== word.toLowerCase();
-                          
-                          if (!isIncorrect) return null;
-                          
-                          return (
-                            <div key={idx} className="bg-white dark:bg-gray-800 p-3 rounded border border-red-200 dark:border-red-800">
-                              <div className="flex items-center justify-between gap-4">
-                                <div className="flex-1">
-                                  <div className="text-sm text-gray-600 dark:text-gray-400">Your answer:</div>
-                                  <div className="font-medium text-red-600 dark:text-red-400">
-                                    {userWord || '(no answer)'}
-                                  </div>
-                                </div>
-                                <div className="text-gray-400">→</div>
-                                <div className="flex-1">
-                                  <div className="text-sm text-gray-600 dark:text-gray-400">Correct answer:</div>
-                                  <div className="font-medium text-green-600 dark:text-green-400">
-                                    {word}
-                                  </div>
-                                </div>
+                    {gameState.wordRecalls
+                      .filter(recall => !recall.isCorrect)
+                      .map((recall, idx) => (
+                        <div key={idx} className="bg-white dark:bg-gray-800 p-3 rounded border border-red-200 dark:border-red-800">
+                          <div className="flex items-center justify-between gap-4">
+                            <div className="flex-1">
+                              <div className="text-sm text-gray-600 dark:text-gray-400">Your answer:</div>
+                              <div className="font-medium text-red-600 dark:text-red-400">
+                                {recall.userAnswer || '(no answer)'}
                               </div>
                             </div>
-                          );
-                        })}
-                      </div>
-                    ))}
-                    {gameState.mistakes.wordErrors.every(error => 
-                      error.correctWords.every((word, idx) => 
-                        error.userWords[idx]?.toLowerCase() === word.toLowerCase()
-                      )
-                    ) && (
+                            <div className="text-gray-400">→</div>
+                            <div className="flex-1">
+                              <div className="text-sm text-gray-600 dark:text-gray-400">Correct answer:</div>
+                              <div className="font-medium text-green-600 dark:text-green-400">
+                                {recall.correctAnswer}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    }
+                    {gameState.wordRecalls.every(recall => recall.isCorrect) && (
                       <p className="text-red-700 dark:text-red-300 text-sm">All words were answered correctly!</p>
                     )}
                   </div>
