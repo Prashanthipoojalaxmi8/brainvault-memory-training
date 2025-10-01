@@ -126,6 +126,16 @@ export function validateAnswer(userInput: string, correctAnswer: string): boolea
   const userClean = userInput.toLowerCase().trim().replace(/\s+/g, '');
   const correctClean = correctAnswer.toLowerCase().trim().replace(/\s+/g, '');
   
+  console.log('validateAnswer DEBUG:', {
+    userInput,
+    correctAnswer,
+    userClean,
+    correctClean,
+    areEqual: userClean === correctClean,
+    userType: typeof userInput,
+    correctType: typeof correctAnswer
+  });
+  
   // Strict exact match only - no tolerance for differences
   return userClean === correctClean;
 }
