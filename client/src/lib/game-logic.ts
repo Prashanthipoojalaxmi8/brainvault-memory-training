@@ -156,7 +156,7 @@ const WORDS = ["Apple", "Chair", "Tree", "Bottle", "Window", "Pencil", "Laptop",
 export function generateMathQuestion(level: number): { question: string; answer: number } {
   let a: number, b: number, op: string, question: string, answer: number;
 
-  if (level === 1) { // Easy
+  if (level === 1) { // Easy - Simple addition and subtraction
     a = Math.floor(Math.random() * 10) + 1;
     b = Math.floor(Math.random() * 10) + 1;
     op = Math.random() < 0.5 ? '+' : '-';
@@ -164,27 +164,27 @@ export function generateMathQuestion(level: number): { question: string; answer:
     
     question = `${a} ${op} ${b}`;
     answer = op === '+' ? a + b : a - b;
-  } else if (level === 2) { // Medium
-    a = Math.floor(Math.random() * 9) + 2;
-    b = Math.floor(Math.random() * 9) + 2;
-    op = Math.random() < 0.5 ? '*' : '/';
+  } else if (level === 2) { // Medium - Simple multiplication (2-5 range)
+    a = Math.floor(Math.random() * 4) + 2; // 2 to 5
+    b = Math.floor(Math.random() * 4) + 2; // 2 to 5
+    op = '*';
     
-    if (op === '/') {
-      // Generate division that results in whole numbers
-      const dividend = a * b; // Make sure dividend is divisible by b
-      question = `${dividend} ${op} ${b}`;
-      answer = dividend / b; // This should equal a
-    } else {
-      question = `${a} ${op} ${b}`;
-      answer = a * b;
-    }
-  } else { // Mixed
-    a = Math.floor(Math.random() * 11) + 5;
-    b = Math.floor(Math.random() * 10) + 1;
+    question = `${a} ${op} ${b}`;
+    answer = a * b; // Max will be 5*5=25
+  } else { // Mixed - All operations but keep numbers small
     const operations = ['+', '-', '*'];
     op = operations[Math.floor(Math.random() * operations.length)];
     
-    if (op === '-' && a < b) [a, b] = [b, a];
+    if (op === '*') {
+      // Keep multiplication simple
+      a = Math.floor(Math.random() * 4) + 2; // 2 to 5
+      b = Math.floor(Math.random() * 4) + 2; // 2 to 5
+    } else {
+      // Addition and subtraction use 1-10
+      a = Math.floor(Math.random() * 10) + 1;
+      b = Math.floor(Math.random() * 10) + 1;
+      if (op === '-' && a < b) [a, b] = [b, a];
+    }
     
     question = `${a} ${op} ${b}`;
     if (op === '+') {
