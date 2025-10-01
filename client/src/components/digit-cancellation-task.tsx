@@ -97,8 +97,12 @@ export function DigitCancellationTask({ onBackToMenu }: DigitCancellationTaskPro
       startTime: currentTime,
       completionTime: 0,
       stats: {
-        ...prev.stats,
-        totalTargets: targetCount
+        hits: 0,
+        omissions: 0,
+        falsePositives: 0,
+        totalTargets: targetCount,
+        accuracy: 0,
+        speed: 0
       },
       gridSize: { rows: config.rows, cols: config.cols }
     }));
