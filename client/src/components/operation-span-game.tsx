@@ -71,6 +71,7 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
   const [transitionData, setTransitionData] = useState<{title: string, description?: string, type: 'success' | 'error' | 'info'}>({title: '', type: 'info'});
   const [showWordFlash, setShowWordFlash] = useState(false);
   const [previousScore, setPreviousScore] = useState(0);
+  const [expandedSection, setExpandedSection] = useState<'correct' | 'incorrect' | null>(null);
 
   // Initialize first math question when component mounts
   useEffect(() => {
@@ -669,13 +670,112 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
                   </div>
                   <div className="text-sm text-gray-600">Math Correct</div>
                 </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">
+                <div 
+                  className="text-center cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20 p-3 rounded-lg transition-colors"
+                  onClick={() => setExpandedSection(expandedSection === 'correct' ? null : 'correct')}
+                  data-testid="button-words-correct"
+                >
+                  <div className="text-2xl font-bold text-green-600">
                     {gameState.stats.wordsCorrect}
                   </div>
                   <div className="text-sm text-gray-600">Words Correct</div>
                 </div>
+                <div 
+                  className="text-center cursor-pointer hover:bg-red-50 dark:hover:bg-red-900/20 p-3 rounded-lg transition-colors"
+                  onClick={() => setExpandedSection(expandedSection === 'incorrect' ? null : 'incorrect')}
+                  data-testid="button-words-incorrect"
+                >
+                  <div className="text-2xl font-bold text-red-600">
+                    {gameState.mistakes.wordErrors.reduce((sum, error) => sum + (error.correctWords.length - error.correctCount), 0)}
+                  </div>
+                  <div className="text-sm text-gray-600">Words Incorrect</div>
+                </div>
               </div>
+
+              {/* Expanded Correct Words Section */}
+              {expandedSection === 'correct' && (
+                <motion.div 
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mb-6 bg-green-50 dark:bg-green-900/20 p-4 rounded-lg"
+                >
+                  <h4 className="font-semibold text-green-700 dark:text-green-300 mb-3">✓ Correct Words:</h4>
+                  {(() => {
+                    const correctWords: string[] = [];
+                    gameState.mistakes.wordErrors.forEach((error) => {
+                      error.correctWords.forEach((word, idx) => {
+                        if (error.userWords[idx]?.toLowerCase() === word.toLowerCase()) {
+                          correctWords.push(word);
+                        }
+                      });
+                    });
+                    
+                    return correctWords.length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {correctWords.map((word, idx) => (
+                          <span key={idx} className="bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-100 px-3 py-1 rounded-full text-sm font-medium">
+                            {word}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-green-700 dark:text-green-300 text-sm">No words were answered correctly.</p>
+                    );
+                  })()}
+                </motion.div>
+              )}
+
+              {/* Expanded Incorrect Words Section */}
+              {expandedSection === 'incorrect' && (
+                <motion.div 
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mb-6 bg-red-50 dark:bg-red-900/20 p-4 rounded-lg"
+                >
+                  <h4 className="font-semibold text-red-700 dark:text-red-300 mb-3">✗ Incorrect Words:</h4>
+                  <div className="space-y-3">
+                    {gameState.mistakes.wordErrors.map((error, errorIdx) => (
+                      <div key={errorIdx}>
+                        {error.correctWords.map((word, idx) => {
+                          const userWord = error.userWords[idx] || '';
+                          const isIncorrect = userWord.toLowerCase() !== word.toLowerCase();
+                          
+                          if (!isIncorrect) return null;
+                          
+                          return (
+                            <div key={idx} className="bg-white dark:bg-gray-800 p-3 rounded border border-red-200 dark:border-red-800">
+                              <div className="flex items-center justify-between gap-4">
+                                <div className="flex-1">
+                                  <div className="text-sm text-gray-600 dark:text-gray-400">Your answer:</div>
+                                  <div className="font-medium text-red-600 dark:text-red-400">
+                                    {userWord || '(no answer)'}
+                                  </div>
+                                </div>
+                                <div className="text-gray-400">→</div>
+                                <div className="flex-1">
+                                  <div className="text-sm text-gray-600 dark:text-gray-400">Correct answer:</div>
+                                  <div className="font-medium text-green-600 dark:text-green-400">
+                                    {word}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ))}
+                    {gameState.mistakes.wordErrors.every(error => 
+                      error.correctWords.every((word, idx) => 
+                        error.userWords[idx]?.toLowerCase() === word.toLowerCase()
+                      )
+                    ) && (
+                      <p className="text-red-700 dark:text-red-300 text-sm">All words were answered correctly!</p>
+                    )}
+                  </div>
+                </motion.div>
+              )}
 
               {/* Mistake Summary */}
               {(gameState.mistakes.mathErrors.length > 0 || gameState.mistakes.wordErrors.length > 0) && (
