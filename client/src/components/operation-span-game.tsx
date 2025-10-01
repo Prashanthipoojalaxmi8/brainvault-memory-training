@@ -688,7 +688,7 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
                   data-testid="button-words-correct"
                 >
                   <div className="text-2xl font-bold text-green-600">
-                    {gameState.stats.wordsCorrect}
+                    {gameState.wordRecalls.filter(recall => recall.isCorrect).length}
                   </div>
                   <div className="text-sm text-gray-600">Words Correct</div>
                 </div>
@@ -698,7 +698,7 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
                   data-testid="button-words-incorrect"
                 >
                   <div className="text-2xl font-bold text-red-600">
-                    {gameState.mistakes.wordErrors.reduce((sum, error) => sum + (error.correctWords.length - error.correctCount), 0)}
+                    {gameState.wordRecalls.filter(recall => !recall.isCorrect).length}
                   </div>
                   <div className="text-sm text-gray-600">Words Incorrect</div>
                 </div>
