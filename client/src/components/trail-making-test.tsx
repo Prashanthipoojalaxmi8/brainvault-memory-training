@@ -146,8 +146,8 @@ export function TrailMakingTest({ onBackToMenu }: TrailMakingTestProps) {
     if (gameMode === 'TMT-A') {
       return current === 25;
     }
-    // TMT-B ends at 13-L
-    return type === 'letter' && current === 'L';
+    // TMT-B ends at 13 (the sequence is 1-A-2-B-...-12-L-13)
+    return type === 'number' && current === 13;
   };
 
   const handleCircleClick = (circle: TMTCircle) => {
