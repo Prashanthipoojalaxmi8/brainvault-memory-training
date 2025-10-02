@@ -44,8 +44,8 @@ export function TrailMakingTest({ onBackToMenu }: TrailMakingTestProps) {
   // Generate random positions for circles without overlap
   const generatePositions = (count: number): { x: number; y: number }[] => {
     const positions: { x: number; y: number }[] = [];
-    const minDistance = 80;
-    const maxAttempts = 100;
+    const minDistance = 12; // 12% minimum distance between circles
+    const maxAttempts = 200;
     
     for (let i = 0; i < count; i++) {
       let attempt = 0;
@@ -53,8 +53,8 @@ export function TrailMakingTest({ onBackToMenu }: TrailMakingTestProps) {
       
       do {
         position = {
-          x: Math.random() * (90 - 10) + 5, // 5-95% to keep within bounds
-          y: Math.random() * (90 - 10) + 5  // 5-95% to keep within bounds
+          x: Math.random() * (85 - 8) + 8, // 8-93% to keep within bounds
+          y: Math.random() * (85 - 8) + 8  // 8-93% to keep within bounds
         };
         attempt++;
       } while (
@@ -407,10 +407,10 @@ export function TrailMakingTest({ onBackToMenu }: TrailMakingTestProps) {
         </AnimatePresence>
 
         {circles.map((circle) => (
-          <motion.button
+          <button
             key={circle.id}
             onClick={() => handleCircleClick(circle)}
-            className={`absolute w-12 h-12 rounded-full border-2 flex items-center justify-center font-bold text-lg transform -translate-x-1/2 -translate-y-1/2 transition-all duration-200 ${
+            className={`absolute w-12 h-12 rounded-full border-2 flex items-center justify-center font-bold text-lg transform -translate-x-1/2 -translate-y-1/2 ${
               circle.clicked 
                 ? 'bg-green-500 border-green-600 text-white' 
                 : circle.type === 'number'
@@ -421,12 +421,10 @@ export function TrailMakingTest({ onBackToMenu }: TrailMakingTestProps) {
               left: `${circle.x}%`,
               top: `${circle.y}%`,
             }}
-            whileHover={{ scale: circle.clicked ? 1 : 1.1 }}
-            whileTap={{ scale: 0.95 }}
             disabled={circle.clicked || !gameStarted || gameCompleted}
           >
             {circle.value}
-          </motion.button>
+          </button>
         ))}
 
         {/* Game Completed Modal */}
