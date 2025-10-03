@@ -116,6 +116,16 @@ export function GameInterface({ mode, onBackToMenu }: GameInterfaceProps) {
     const correctAnswer = getCorrectAnswer(gameState.currentSequence, config.reverse);
     const isCorrect = validateAnswer(gameState.userInput, correctAnswer);
     
+    console.log('DEBUG Digit/Spatial Span validation:', {
+      mode: mode,
+      sequence: gameState.currentSequence,
+      userInput: gameState.userInput,
+      correctAnswer: correctAnswer,
+      userInputCleaned: gameState.userInput.toLowerCase().trim().replace(/\s+/g, ''),
+      correctAnswerCleaned: correctAnswer.toLowerCase().trim().replace(/\s+/g, ''),
+      isCorrect: isCorrect
+    });
+    
     showFeedback(isCorrect, gameState.userInput, correctAnswer, responseTime);
   };
 
