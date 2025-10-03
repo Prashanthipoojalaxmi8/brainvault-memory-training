@@ -65,22 +65,6 @@ export function StroopColorGame({ onBackToMenu }: StroopColorGameProps) {
     }));
   }, []);
 
-  // End current round
-  const endRound = useCallback(() => {
-    setGameState(prev => {
-      const newRoundScores = [...prev.stats.roundScores, prev.score - (prev.stats.roundScores.reduce((sum, score) => sum + score, 0))];
-      
-      return {
-        ...prev,
-        gamePhase: prev.currentRound >= prev.totalRounds ? 'gameComplete' : 'roundComplete',
-        stats: {
-          ...prev.stats,
-          roundScores: newRoundScores
-        }
-      };
-    });
-  }, []);
-
   // Start a new round
   const startRound = useCallback(() => {
     setGameState(prev => ({
@@ -123,12 +107,24 @@ export function StroopColorGame({ onBackToMenu }: StroopColorGameProps) {
     
     // Check if round is complete
     if (newQuestionsAnswered >= maxQuestions) {
-      endRound();
+      // End round directly without calling the callback
+      setGameState(prev => {
+        const newRoundScores = [...prev.stats.roundScores, prev.score - (prev.stats.roundScores.reduce((sum, score) => sum + score, 0))];
+        
+        return {
+          ...prev,
+          gamePhase: prev.currentRound >= prev.totalRounds ? 'gameComplete' : 'roundComplete',
+          stats: {
+            ...prev.stats,
+            roundScores: newRoundScores
+          }
+        };
+      });
     } else {
       // Generate next word
       generateNewWord();
     }
-  }, [gameState.gamePhase, gameState.userInput, gameState.currentColor, gameState.currentRound, questionsAnswered, generateNewWord, endRound]);
+  }, [gameState.gamePhase, gameState.userInput, gameState.currentColor, gameState.currentRound, questionsAnswered, generateNewWord]);
 
   // Start next round
   const nextRound = useCallback(() => {
