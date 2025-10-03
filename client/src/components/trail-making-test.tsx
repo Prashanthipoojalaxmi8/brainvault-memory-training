@@ -160,42 +160,47 @@ export function TrailMakingTest({ onBackToMenu }: TrailMakingTestProps) {
 
     // Check if this is the correct target
     if (circle.value === currentTarget && circle.type === targetType) {
-      // Correct click
+      // Correct click - mark the circle as clicked first
       setCircles(prev => prev.map(c => 
         c.id === circle.id ? { ...c, clicked: true } : c
       ));
 
-      // Check if game is complete
-      if (isGameComplete(currentTarget, targetType)) {
-        const endTime = Date.now();
-        const totalTime = Math.round((endTime - (startTime || endTime)) / 1000);
-        setCompletionTime(totalTime);
-        setGameCompleted(true);
-        
-        const result: TMTResults = {
-          mode: gameMode as 'TMT-A' | 'TMT-B',
-          completionTime: totalTime,
-          errors,
-          completed: true
-        };
-        
-        if (isSessionMode) {
-          setSessionResults(prev => [...prev, result]);
+      // Check if this was the last target
+      const wasLastTarget = isGameComplete(currentTarget, targetType);
+      
+      if (wasLastTarget) {
+        // Delay game completion slightly so user sees the last circle turn green
+        setTimeout(() => {
+          const endTime = Date.now();
+          const totalTime = Math.round((endTime - (startTime || endTime)) / 1000);
+          setCompletionTime(totalTime);
+          setGameCompleted(true);
           
-          // If TMT-A completed in session mode, start TMT-B
-          if (gameMode === 'TMT-A') {
-            setTimeout(() => {
-              setGameMode('TMT-B');
-              initializeTMTB();
-              resetGameState();
-            }, 2000);
+          const result: TMTResults = {
+            mode: gameMode as 'TMT-A' | 'TMT-B',
+            completionTime: totalTime,
+            errors,
+            completed: true
+          };
+          
+          if (isSessionMode) {
+            setSessionResults(prev => [...prev, result]);
+            
+            // If TMT-A completed in session mode, start TMT-B
+            if (gameMode === 'TMT-A') {
+              setTimeout(() => {
+                setGameMode('TMT-B');
+                initializeTMTB();
+                resetGameState();
+              }, 2000);
+            }
           }
-        }
-        
-        toast({
-          title: "Congratulations!",
-          description: `${gameMode} completed in ${totalTime} seconds with ${errors} errors.`,
-        });
+          
+          toast({
+            title: "Congratulations!",
+            description: `${gameMode} completed in ${totalTime} seconds with ${errors} errors.`,
+          });
+        }, 300);
       } else {
         // Set next target
         const next = getNextTarget(currentTarget, targetType);
