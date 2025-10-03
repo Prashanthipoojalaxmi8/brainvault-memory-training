@@ -12,7 +12,7 @@ interface StroopColorGameProps {
 }
 
 // Available colors - simple and easy to recognize
-const COLORS = ["Red", "Blue", "Yellow", "Green", "Pink", "Purple"];
+const COLORS = ["Red", "Blue", "Yellow", "Green", "Pink", "Black"];
 
 // Round settings with question counts
 const ROUND_SETTINGS = [
@@ -28,7 +28,7 @@ const COLOR_MAP: Record<string, string> = {
   Yellow: "#EAB308",
   Green: "#16A34A", 
   Pink: "#EC4899",
-  Purple: "#9333EA"
+  Black: "#000000"
 };
 
 export function StroopColorGame({ onBackToMenu }: StroopColorGameProps) {
