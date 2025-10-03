@@ -11,28 +11,26 @@ interface StroopColorGameProps {
   onBackToMenu: () => void;
 }
 
-// Available colors matching the original Python code
-const COLORS = ["Red", "Green", "Blue", "Yellow", "Purple", "Pink", "Orange", "Cyan"];
+// Available colors - simple and easy to recognize
+const COLORS = ["Red", "Blue", "Yellow", "Green", "Orange", "Purple"];
 
-// Round settings with time limits (in seconds) from the original code
+// Round settings with time limits (in seconds)
 const ROUND_SETTINGS = [
-  { time: 20 }, // Round 1
-  { time: 25 }, // Round 2  
-  { time: 30 }, // Round 3
-  { time: 35 }, // Round 4
-  { time: 40 }, // Round 5
+  { time: 50 }, // Round 1
+  { time: 60 }, // Round 2  
+  { time: 70 }, // Round 3
+  { time: 80 }, // Round 4
+  { time: 90 }, // Round 5
 ];
 
-// Color mapping for CSS colors
+// Color mapping for CSS colors - bright and clear
 const COLOR_MAP: Record<string, string> = {
   Red: "#DC2626",
-  Green: "#16A34A", 
   Blue: "#2563EB",
-  Yellow: "#CA8A04",
-  Purple: "#9333EA",
-  Pink: "#EC4899",
+  Yellow: "#EAB308",
+  Green: "#16A34A", 
   Orange: "#EA580C",
-  Cyan: "#0891B2"
+  Purple: "#9333EA"
 };
 
 export function StroopColorGame({ onBackToMenu }: StroopColorGameProps) {
@@ -41,7 +39,7 @@ export function StroopColorGame({ onBackToMenu }: StroopColorGameProps) {
     currentRound: 1,
     totalRounds: 5,
     score: 0,
-    timeRemaining: 20,
+    timeRemaining: 50,
     currentWord: "",
     currentColor: "",
     userInput: "",
