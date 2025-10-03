@@ -192,6 +192,7 @@ export function TrailMakingTest({ onBackToMenu }: TrailMakingTestProps) {
                 setGameMode('TMT-B');
                 initializeTMTB();
                 resetGameState();
+                setGameStarted(true); // Re-enable clicking for TMT-B
               }, 2000);
             }
           }
