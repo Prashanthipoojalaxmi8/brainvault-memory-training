@@ -119,14 +119,31 @@ export function generateSequence(mode: GameMode, length: number): (string | numb
 
 export function getCorrectAnswer(sequence: (string | number)[], reverse: boolean): string {
   const result = reverse ? [...sequence].reverse() : sequence;
-  return result.join('');
+  const answer = result.join('');
+  console.log('DEBUG getCorrectAnswer:', {
+    sequence,
+    reverse,
+    result,
+    answer
+  });
+  return answer;
 }
 
 export function validateAnswer(userInput: string, correctAnswer: string): boolean {
   const userClean = userInput.toLowerCase().trim().replace(/\s+/g, '');
   const correctClean = correctAnswer.toLowerCase().trim().replace(/\s+/g, '');
+  const isMatch = userClean === correctClean;
   
-  return userClean === correctClean;
+  console.log('DEBUG validateAnswer:', {
+    userInput,
+    correctAnswer,
+    userClean,
+    correctClean,
+    isMatch,
+    charByChar: `"${userClean}" vs "${correctClean}"`
+  });
+  
+  return isMatch;
 }
 
 export function calculateScore(level: number, timeRemaining: number): number {
