@@ -157,50 +157,52 @@ export function DigitCancellationTask({ onBackToMenu }: DigitCancellationTaskPro
 
   const finishTrial = useCallback(() => {
     const endTime = Date.now();
-    const timeUsed = gameState.startTime ? Math.round((endTime - gameState.startTime) / 1000) : gameState.timeLimit - gameState.timeRemaining;
     
-    // Calculate omissions (targets not marked)
-    let omissions = 0;
-    gameState.grid.forEach((row, rowIndex) => {
-      row.forEach((digit, colIndex) => {
-        if (gameState.targetDigits.includes(digit)) {
-          const position = `${rowIndex},${colIndex}`;
-          if (!gameState.markedPositions.has(position)) {
-            omissions++;
+    setGameState(prev => {
+      const timeUsed = prev.startTime ? Math.round((endTime - prev.startTime) / 1000) : prev.timeLimit - prev.timeRemaining;
+      
+      // Calculate omissions (targets not marked) - using current state
+      let omissions = 0;
+      prev.grid.forEach((row, rowIndex) => {
+        row.forEach((digit, colIndex) => {
+          if (prev.targetDigits.includes(digit)) {
+            const position = `${rowIndex},${colIndex}`;
+            if (!prev.markedPositions.has(position)) {
+              omissions++;
+            }
           }
-        }
+        });
       });
+
+      const accuracy = prev.stats.totalTargets > 0 
+        ? (prev.stats.hits / prev.stats.totalTargets) * 100 
+        : 0;
+      const speed = prev.stats.hits / (timeUsed || 1);
+
+      // Store trial result
+      const trialResult = {
+        trial: prev.trial,
+        level: prev.currentLevel,
+        timeUsed,
+        timeLimit: prev.timeLimit,
+        hits: prev.stats.hits,
+        accuracy: Math.round(accuracy)
+      };
+
+      return {
+        ...prev,
+        gamePhase: 'complete',
+        completionTime: timeUsed,
+        stats: {
+          ...prev.stats,
+          omissions,
+          accuracy: Math.round(accuracy),
+          speed: Math.round(speed * 100) / 100
+        },
+        trialResults: [...prev.trialResults, trialResult]
+      };
     });
-
-    const totalMarked = gameState.markedPositions.size;
-    const accuracy = gameState.stats.totalTargets > 0 
-      ? (gameState.stats.hits / gameState.stats.totalTargets) * 100 
-      : 0;
-    const speed = gameState.stats.hits / (timeUsed || 1);
-
-    // Store trial result
-    const trialResult = {
-      trial: gameState.trial,
-      level: gameState.currentLevel,
-      timeUsed,
-      timeLimit: gameState.timeLimit,
-      hits: gameState.stats.hits,
-      accuracy: Math.round(accuracy)
-    };
-
-    setGameState(prev => ({
-      ...prev,
-      gamePhase: 'complete',
-      completionTime: timeUsed,
-      stats: {
-        ...prev.stats,
-        omissions,
-        accuracy: Math.round(accuracy),
-        speed: Math.round(speed * 100) / 100
-      },
-      trialResults: [...prev.trialResults, trialResult]
-    }));
-  }, [gameState.grid, gameState.targetDigits, gameState.markedPositions, gameState.stats, gameState.timeLimit, gameState.timeRemaining, gameState.startTime, gameState.trial, gameState.currentLevel]);
+  }, []);
 
   const nextTrial = useCallback(() => {
     if (gameState.trial < gameState.totalTrials) {
