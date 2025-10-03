@@ -306,7 +306,8 @@ export function StroopColorGame({ onBackToMenu }: StroopColorGameProps) {
               </div>
 
               <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                <h3 className="font-semibold mb-2">Round Breakdown:</h3>
+                <h3 className="font-semibold mb-1">Round Breakdown:</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">(Correctly answered)</p>
                 <div className="grid grid-cols-5 gap-2">
                   {gameState.stats.roundScores.map((score, index) => (
                     <div key={index} className="text-center">
