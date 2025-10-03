@@ -64,6 +64,7 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
   const [operationWordPairs, setOperationWordPairs] = useState<{operation: string, word: string, answer: number}[]>([]);
   const [shuffledRecallOperations, setShuffledRecallOperations] = useState<{operation: string, word: string, answer: number}[]>([]);
   const [currentRecallIndex, setCurrentRecallIndex] = useState(0);
+  const [usedWordsInRound, setUsedWordsInRound] = useState<string[]>([]); // Track used words in current round
 
   const [currentMathData, setCurrentMathData] = useState<{question: string, answer: number} | null>(null);
   const [currentWordData, setCurrentWordData] = useState<string>('');
@@ -73,6 +74,23 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
   const [showWordFlash, setShowWordFlash] = useState(false);
   const [previousScore, setPreviousScore] = useState(0);
   const [expandedSection, setExpandedSection] = useState<'correct' | 'incorrect' | null>(null);
+
+  // Get a unique random word that hasn't been used in this round
+  const getUniqueRandomWord = (): string => {
+    const availableWords = ["Apple", "Chair", "Tree", "Bottle", "Window", "Pencil", "Laptop", "Phone", "Bag", "Shoes", "Clock", "Mouse", "Camera", "Paper", "Flower", "Coffee", "Music", "Garden", "Bridge", "Ocean"];
+    
+    // Filter out already used words
+    const unusedWords = availableWords.filter(word => !usedWordsInRound.includes(word));
+    
+    // If all words have been used (shouldn't happen in normal gameplay), reset and start over
+    if (unusedWords.length === 0) {
+      console.warn('All words used in round, resetting word pool');
+      return availableWords[Math.floor(Math.random() * availableWords.length)];
+    }
+    
+    // Return a random word from unused words
+    return unusedWords[Math.floor(Math.random() * unusedWords.length)];
+  };
 
   // Initialize first math question when component mounts
   useEffect(() => {
@@ -141,9 +159,10 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
     
     setShowTransition(true);
     
-    // Generate word and store the operation-word pair
-    const word = getRandomWord();
+    // Generate unique word (no repeats in same round) and store the operation-word pair
+    const word = getUniqueRandomWord();
     setCurrentWordData(word);
+    setUsedWordsInRound(prev => [...prev, word]); // Track this word as used
     
     // Store the operation-word pair
     setOperationWordPairs(prev => [
@@ -283,6 +302,7 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
             setOperationWordPairs([]);
             setShuffledRecallOperations([]);
             setCurrentRecallIndex(0);
+            setUsedWordsInRound([]); // Reset used words for new level
             
             const nextLevelPairs = getTotalPairs(newLevel);
             const mathData = generateMathQuestion(newLevel);
@@ -373,6 +393,7 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
     setOperationWordPairs([]);
     setShuffledRecallOperations([]);
     setCurrentRecallIndex(0);
+    setUsedWordsInRound([]); // Reset used words when restarting game
     
     setGameState({
       currentLevel: 1,
