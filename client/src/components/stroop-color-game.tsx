@@ -12,15 +12,13 @@ interface StroopColorGameProps {
 }
 
 // Available colors - simple and easy to recognize
-const COLORS = ["Red", "Blue", "Yellow", "Green", "Orange", "Purple"];
+const COLORS = ["Red", "Blue", "Yellow", "Green", "Pink", "Purple"];
 
-// Round settings with time limits (in seconds)
+// Round settings with question counts
 const ROUND_SETTINGS = [
-  { time: 50 }, // Round 1
-  { time: 60 }, // Round 2  
-  { time: 70 }, // Round 3
-  { time: 80 }, // Round 4
-  { time: 90 }, // Round 5
+  { questions: 10 }, // Round 1 - 10 questions
+  { questions: 15 }, // Round 2 - 15 questions
+  { questions: 20 }, // Round 3 - 20 questions
 ];
 
 // Color mapping for CSS colors - bright and clear
@@ -29,7 +27,7 @@ const COLOR_MAP: Record<string, string> = {
   Blue: "#2563EB",
   Yellow: "#EAB308",
   Green: "#16A34A", 
-  Orange: "#EA580C",
+  Pink: "#EC4899",
   Purple: "#9333EA"
 };
 
@@ -37,9 +35,9 @@ export function StroopColorGame({ onBackToMenu }: StroopColorGameProps) {
   const [gameState, setGameState] = useState<StroopState>(() => ({
     gamePhase: 'instructions',
     currentRound: 1,
-    totalRounds: 5,
+    totalRounds: 3,
     score: 0,
-    timeRemaining: 50,
+    timeRemaining: 0,
     currentWord: "",
     currentColor: "",
     userInput: "",
@@ -51,6 +49,8 @@ export function StroopColorGame({ onBackToMenu }: StroopColorGameProps) {
       roundScores: []
     }
   }));
+  
+  const [questionsAnswered, setQuestionsAnswered] = useState(0);
 
   // Generate a new word/color combination
   const generateNewWord = useCallback(() => {
@@ -64,48 +64,6 @@ export function StroopColorGame({ onBackToMenu }: StroopColorGameProps) {
       userInput: ""
     }));
   }, []);
-
-  // Start a new round
-  const startRound = useCallback(() => {
-    const roundIndex = gameState.currentRound - 1;
-    const roundTime = ROUND_SETTINGS[roundIndex]?.time || 20;
-    
-    setGameState(prev => ({
-      ...prev,
-      gamePhase: 'playing',
-      timeRemaining: roundTime,
-      roundStartTime: Date.now()
-    }));
-    
-    generateNewWord();
-  }, [gameState.currentRound, generateNewWord]);
-
-  // Check user's answer
-  const checkAnswer = useCallback(() => {
-    if (gameState.gamePhase !== 'playing') return;
-
-    const userAnswer = gameState.userInput.trim();
-    const isCorrect = userAnswer.toLowerCase() === gameState.currentColor.toLowerCase();
-    
-    if (isCorrect) {
-      setGameState(prev => ({
-        ...prev,
-        score: prev.score + 1
-      }));
-    }
-
-    setGameState(prev => ({
-      ...prev,
-      stats: {
-        ...prev.stats,
-        totalAttempts: prev.stats.totalAttempts + 1,
-        correctAnswers: prev.stats.correctAnswers + (isCorrect ? 1 : 0)
-      }
-    }));
-
-    // Generate next word immediately
-    generateNewWord();
-  }, [gameState.gamePhase, gameState.userInput, gameState.currentColor, generateNewWord]);
 
   // End current round
   const endRound = useCallback(() => {
@@ -123,16 +81,65 @@ export function StroopColorGame({ onBackToMenu }: StroopColorGameProps) {
     });
   }, []);
 
+  // Start a new round
+  const startRound = useCallback(() => {
+    setGameState(prev => ({
+      ...prev,
+      gamePhase: 'playing',
+      roundStartTime: Date.now()
+    }));
+    
+    setQuestionsAnswered(0);
+    generateNewWord();
+  }, [generateNewWord]);
+
+  // Check user's answer
+  const checkAnswer = useCallback(() => {
+    if (gameState.gamePhase !== 'playing') return;
+
+    const userAnswer = gameState.userInput.trim();
+    const isCorrect = userAnswer.toLowerCase() === gameState.currentColor.toLowerCase();
+    const roundIndex = gameState.currentRound - 1;
+    const maxQuestions = ROUND_SETTINGS[roundIndex]?.questions || 10;
+    
+    if (isCorrect) {
+      setGameState(prev => ({
+        ...prev,
+        score: prev.score + 1
+      }));
+    }
+
+    setGameState(prev => ({
+      ...prev,
+      stats: {
+        ...prev.stats,
+        totalAttempts: prev.stats.totalAttempts + 1,
+        correctAnswers: prev.stats.correctAnswers + (isCorrect ? 1 : 0)
+      }
+    }));
+
+    const newQuestionsAnswered = questionsAnswered + 1;
+    setQuestionsAnswered(newQuestionsAnswered);
+    
+    // Check if round is complete
+    if (newQuestionsAnswered >= maxQuestions) {
+      endRound();
+    } else {
+      // Generate next word
+      generateNewWord();
+    }
+  }, [gameState.gamePhase, gameState.userInput, gameState.currentColor, gameState.currentRound, questionsAnswered, generateNewWord, endRound]);
+
   // Start next round
   const nextRound = useCallback(() => {
     setGameState(prev => ({
       ...prev,
       currentRound: prev.currentRound + 1,
       gamePhase: 'playing',
-      timeRemaining: ROUND_SETTINGS[prev.currentRound]?.time || 20,
       roundStartTime: Date.now()
     }));
     
+    setQuestionsAnswered(0);
     generateNewWord();
   }, [generateNewWord]);
 
@@ -141,9 +148,9 @@ export function StroopColorGame({ onBackToMenu }: StroopColorGameProps) {
     setGameState({
       gamePhase: 'instructions',
       currentRound: 1,
-      totalRounds: 5,
+      totalRounds: 3,
       score: 0,
-      timeRemaining: 20,
+      timeRemaining: 0,
       currentWord: "",
       currentColor: "",
       userInput: "",
@@ -155,23 +162,8 @@ export function StroopColorGame({ onBackToMenu }: StroopColorGameProps) {
         roundScores: []
       }
     });
+    setQuestionsAnswered(0);
   }, []);
-
-  // Timer effect
-  useEffect(() => {
-    if (gameState.gamePhase === 'playing' && gameState.timeRemaining > 0) {
-      const timer = setTimeout(() => {
-        setGameState(prev => ({
-          ...prev,
-          timeRemaining: prev.timeRemaining - 1
-        }));
-      }, 1000);
-
-      return () => clearTimeout(timer);
-    } else if (gameState.gamePhase === 'playing' && gameState.timeRemaining === 0) {
-      endRound();
-    }
-  }, [gameState.gamePhase, gameState.timeRemaining, endRound]);
 
   // Handle enter key press
   const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
@@ -206,16 +198,16 @@ export function StroopColorGame({ onBackToMenu }: StroopColorGameProps) {
                   <p>• <strong>Type the COLOR of the text, not the word itself!</strong></p>
                   <p>• For example: if you see <span style={{color: COLOR_MAP.Blue}}>RED</span>, type "Blue"</p>
                   <p>• Press Enter or click Submit after each answer</p>
-                  <p>• Complete 5 rounds with increasing time limits</p>
+                  <p>• Complete 3 rounds with increasing difficulty</p>
                 </div>
               </div>
 
               <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
-                <h4 className="font-semibold mb-2">Round Time Limits:</h4>
+                <h4 className="font-semibold mb-2">Questions Per Round:</h4>
                 <div className="flex justify-center gap-4 text-sm">
                   {ROUND_SETTINGS.map((round, index) => (
                     <Badge key={index} variant="secondary">
-                      R{index + 1}: {round.time}s
+                      Round {index + 1}: {round.questions} questions
                     </Badge>
                   ))}
                 </div>
@@ -359,18 +351,18 @@ export function StroopColorGame({ onBackToMenu }: StroopColorGameProps) {
           </div>
 
           <div className="flex items-center gap-6">
-            {/* Timer */}
+            {/* Question Counter */}
             <div className="flex items-center gap-2">
-              <Timer className="w-5 h-5 text-red-500" />
-              <span className="text-xl font-bold text-red-500" data-testid="text-timer">
-                {gameState.timeRemaining}s
+              <Brain className="w-5 h-5 text-purple-500" />
+              <span className="text-xl font-bold text-purple-500" data-testid="text-questions">
+                {questionsAnswered} / {ROUND_SETTINGS[gameState.currentRound - 1]?.questions || 10}
               </span>
             </div>
 
             {/* Progress */}
             <div className="w-32">
               <Progress 
-                value={(ROUND_SETTINGS[gameState.currentRound - 1]?.time - gameState.timeRemaining) / ROUND_SETTINGS[gameState.currentRound - 1]?.time * 100} 
+                value={(questionsAnswered / (ROUND_SETTINGS[gameState.currentRound - 1]?.questions || 10)) * 100} 
                 className="h-2"
               />
             </div>
