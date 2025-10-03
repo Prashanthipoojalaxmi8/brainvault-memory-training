@@ -81,6 +81,11 @@ export function StroopColorGame({ onBackToMenu }: StroopColorGameProps) {
   const checkAnswer = useCallback(() => {
     if (gameState.gamePhase !== 'playing') return;
 
+    // Prevent empty submissions
+    if (!gameState.userInput || gameState.userInput.trim() === '') {
+      return; // Silently ignore empty submissions during gameplay
+    }
+
     const userAnswer = gameState.userInput.trim();
     const isCorrect = userAnswer.toLowerCase() === gameState.currentColor.toLowerCase();
     const roundIndex = gameState.currentRound - 1;

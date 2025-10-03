@@ -100,6 +100,16 @@ export function GameInterface({ mode, onBackToMenu }: GameInterfaceProps) {
   };
 
   const submitAnswer = () => {
+    // Prevent empty submissions
+    if (!gameState.userInput || gameState.userInput.trim() === '') {
+      toast({
+        title: "Please enter a sequence",
+        description: "You must type something before submitting.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     if (gameTimer) clearInterval(gameTimer);
     
     const responseTime = Date.now() - startTime;

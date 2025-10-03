@@ -109,6 +109,16 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
   }, [isInitialized, gameState.currentLevel]);
 
   const handleMathSubmit = () => {
+    // Prevent empty submissions
+    if (!gameState.userMathInput || gameState.userMathInput.trim() === '') {
+      toast({
+        title: "Please enter an answer",
+        description: "You must type a number before submitting.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     if (!currentMathData) return;
     
     const isCorrect = validateMathAnswer(gameState.userMathInput, currentMathData.answer);
@@ -222,6 +232,16 @@ export function OperationSpanGame({ onBackToMenu }: OperationSpanGameProps) {
   };
 
   const handleRecallSubmit = () => {
+    // Prevent empty submissions
+    if (!gameState.userRecallInput || gameState.userRecallInput.trim() === '') {
+      toast({
+        title: "Please enter a word",
+        description: "You must type a word before submitting.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     const currentOperation = shuffledRecallOperations[currentRecallIndex];
     
     // Clean both answers thoroughly
